@@ -1,0 +1,16 @@
+## Connect to account
+az login
+
+## List Resource Group Accounts
+az group list --output table
+
+
+## To create a storage account (to specify a type of storage account use "--Kind")
+az group create --name az-vscode-demo --location westeurope
+
+
+
+
+
+
+

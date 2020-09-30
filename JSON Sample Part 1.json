@@ -1,0 +1,22 @@
+{
+  "name": "Marino",
+  "age": 35,
+  "isTeamLead": true,
+  "hobbies": ["Working Hard", "Family Time"],
+
+  "colleagues": [
+    {
+      "name": "Sami",
+      "age": 26,
+      "isTeamLead": false,
+      "hobbies": ["Studying", "Gaming"],
+
+      "colleagues": {
+        "name": "Gautam",
+        "age": 29,
+        "isTeamLead": false,
+        "hobbies": ["Being a Policeman", "Motorbiking"]
+      }
+    }
+  ]
+}

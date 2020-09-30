@@ -4,7 +4,7 @@
   "parameters": {
     "deploymentPrefix": {
       "type": "string",
-      "minLength": 3,
+      "minLength": 4,
       "maxLength": 8
     },
     "storageAccountType": {
@@ -47,6 +47,5 @@
       "properties": {}
     }
   ],
-  "outputs": {
-  }
+  "outputs": {}
 }

@@ -1,6 +1,6 @@
-$vmName = "fnazucrpsql1701"
-$vault = "KV-ENC-UKS-CD840A207DDB4"
-$Drive = "L:"
+﻿$vmName = [VirtualMachineName]
+$vault = [VaultName]
+$Drive = [DriveLetter]
 
 $kvSecret = Get-AzKeyVaultSecret -VaultName $vault | where { ($_.Tags.MachineName -eq $vmName) -and ($_.ContentType -match 'BEK') -and ($_.Tags.VolumeLetter -eq $Drive) } `
 | Sort-Object -Descending -Property Created

@@ -1,5 +1,0 @@
-resources
-| where == 'microsoft.network/publicipaddressess' | where properties.gatewayIpAddress == '$SearchIP' | project name, IpAddress=properties.gatewayIpAddress
-
-
-az login

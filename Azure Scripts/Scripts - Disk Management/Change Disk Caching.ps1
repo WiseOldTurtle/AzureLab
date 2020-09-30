@@ -1,6 +1,6 @@
 ## Define some Variables for your VM and RG
-$myRgName = "[Resource Group Name]"
-$myVMName = "[Name of your VM]"
+$myRgName = [ResourceGroupName]
+$myVMName = [VMName]
 
 ## Set a Variable to gather information about your VM
 $myVM = Get-AzVM -ResourceGroupName $myRgName -VMName $myVmName
@@ -29,7 +29,7 @@ $myVM.StorageProfile.OsDisk.Caching
 $myVM.StorageProfile.DataDisks
 
 ## Add a new Disk (for convenience we will store the Disk name as a Variable)
-$newDiskName = "[Disk Name]"
+$newDiskName = [DiskName]
 
 ## Run this command to configure a 1GB Disk (LUN value has to be not taken if defined)
 Add-AzVMDataDisk -VM $myVM -Name $newDiskName  -LUN 1  -DiskSizeinGB 1 -CreateOption Empty

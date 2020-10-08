@@ -1,61 +1,42 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "location": {
-      "value": "uksouth"
-    },
-    "networkInterfaceName": {
-      "value": "winserv-vnic"
-    },
-    "networkSecurityGroupName": {
-      "value": "WinServ-nsg"
-    },
-    "networkSecurityGroupRules": {
-      "value": []
-    },
-    "subnetName": {
-      "value": "default"
-    },
-    "virtualNetworkName": {
-      "value": "LabEnvironment-vnet"
-    },
-    "addressPrefixes": {
-      "value": ["10.0.1.0/24"]
-    },
-    "subnets": {
-      "value": [
-        {
-          "name": "default",
-          "properties": {
-            "addressPrefix": "10.1.0.0/24"
-          }
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "uksouth"
+        },
+        "networkInterfaceName": {
+            "value": "winserv475"
+        },
+        "subnetName": {
+            "value": "Subnet1"
+        },
+        "virtualNetworkId": {
+            "value": "/subscriptions/dee63b58-8ba6-46f7-81bc-3613f27c8b88/resourceGroups/LabEnvironment/providers/Microsoft.Network/virtualNetworks/LabEnvironment-vnet"
+        },
+        "virtualMachineName": {
+            "value": "WinServ"
+        },
+        "virtualMachineComputerName": {
+            "value": "WinServ"
+        },
+        "virtualMachineRG": {
+            "value": "LabEnvironment"
+        },
+        "osDiskType": {
+            "value": "Standard_LRS"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_B1s"
+        },
+        "adminUsername": {
+            "value": "wiseoldturtle"
+        },
+        "adminPassword": {
+            "value": null
+        },
+        "patchMode": {
+            "value": "AutomaticByOS"
         }
-      ]
-    },
-    "virtualMachineName": {
-      "value": "WinServ"
-    },
-    "virtualMachineComputerName": {
-      "value": "WinServ"
-    },
-    "virtualMachineRG": {
-      "value": "LabEnvironment"
-    },
-    "osDiskType": {
-      "value": "Standard_LRS"
-    },
-    "virtualMachineSize": {
-      "value": "Standard_B1s"
-    },
-    "adminUsername": {
-      "value": "WiseOldTurtle"
-    },
-    "adminPassword": {
-      "value": null
-    },
-    "patchMode": {
-      "value": "AutomaticByOS"
     }
-  }
 }

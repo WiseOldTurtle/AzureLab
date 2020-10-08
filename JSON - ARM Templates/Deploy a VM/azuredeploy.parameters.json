@@ -6,32 +6,13 @@
       "value": "uksouth"
     },
     "networkInterfaceName": {
-      "value": "winserv158"
-    },
-    "networkSecurityGroupName": {
-      "value": "WinServ-nsg"
+      "value": "winserv-nic"
     },
     "networkSecurityGroupRules": {
       "value": []
     },
     "subnetName": {
       "value": "default"
-    },
-    "virtualNetworkName": {
-      "value": "LabEnvironment-vnet"
-    },
-    "addressPrefixes": {
-      "value": ["10.1.0.0/24"]
-    },
-    "subnets": {
-      "value": [
-        {
-          "name": "default",
-          "properties": {
-            "addressPrefix": "10.1.0.0/24"
-          }
-        }
-      ]
     },
     "virtualMachineName": {
       "value": "WinServ"

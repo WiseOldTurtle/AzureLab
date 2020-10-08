@@ -8,31 +8,10 @@
     "networkInterfaceName": {
       "type": "string"
     },
-    "networkSecurityGroupName": {
-      "type": "string"
-    },
-    "networkSecurityGroupRules": {
-      "type": "array"
-    },
-    "subnetName": {
-      "type": "string"
-    },
-    "virtualNetworkName": {
-      "type": "string"
-    },
-    "addressPrefixes": {
-      "type": "array"
-    },
-    "subnets": {
-      "type": "array"
-    },
     "virtualMachineName": {
       "type": "string"
     },
     "virtualMachineComputerName": {
-      "type": "string"
-    },
-    "virtualMachineRG": {
       "type": "string"
     },
     "osDiskType": {
@@ -81,27 +60,6 @@
         "networkSecurityGroup": {
           "id": "[variables('nsgId')]"
         }
-      }
-    },
-    {
-      "name": "[parameters('networkSecurityGroupName')]",
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2019-02-01",
-      "location": "[parameters('location')]",
-      "properties": {
-        "securityRules": "[parameters('networkSecurityGroupRules')]"
-      }
-    },
-    {
-      "name": "[parameters('virtualNetworkName')]",
-      "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2019-09-01",
-      "location": "[parameters('location')]",
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": "[parameters('addressPrefixes')]"
-        },
-        "subnets": "[parameters('subnets')]"
       }
     },
     {

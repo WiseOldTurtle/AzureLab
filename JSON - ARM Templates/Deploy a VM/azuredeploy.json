@@ -8,10 +8,19 @@
     "networkInterfaceName": {
       "type": "string"
     },
+    "subnetName": {
+      "type": "string"
+    },
+    "virtualNetworkId": {
+      "type": "string"
+    },
     "virtualMachineName": {
       "type": "string"
     },
     "virtualMachineComputerName": {
+      "type": "string"
+    },
+    "virtualMachineRG": {
       "type": "string"
     },
     "osDiskType": {
@@ -31,8 +40,7 @@
     }
   },
   "variables": {
-    "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
-    "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+    "vnetId": "[parameters('virtualNetworkId')]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
   },
   "resources": [
@@ -41,10 +49,7 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2018-10-01",
       "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
-        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
-      ],
+      "dependsOn": [],
       "properties": {
         "ipConfigurations": [
           {
@@ -56,10 +61,7 @@
               "privateIPAllocationMethod": "Dynamic"
             }
           }
-        ],
-        "networkSecurityGroup": {
-          "id": "[variables('nsgId')]"
-        }
+        ]
       }
     },
     {

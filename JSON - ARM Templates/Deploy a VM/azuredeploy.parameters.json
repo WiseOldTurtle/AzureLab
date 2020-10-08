@@ -6,13 +6,13 @@
       "value": "uksouth"
     },
     "networkInterfaceName": {
-      "value": "winserv-nic"
-    },
-    "networkSecurityGroupRules": {
-      "value": []
+      "value": "winserv203"
     },
     "subnetName": {
-      "value": "default"
+      "value": "Subnet1"
+    },
+    "virtualNetworkId": {
+      "value": "/subscriptions/dee63b58-8ba6-46f7-81bc-3613f27c8b88/resourceGroups/LabEnvironment/providers/Microsoft.Network/virtualNetworks/LabEnvironment-vnet"
     },
     "virtualMachineName": {
       "value": "WinServ"
@@ -30,7 +30,7 @@
       "value": "Standard_B1s"
     },
     "adminUsername": {
-      "value": "WiseOldTurtle"
+      "value": "wiseoldturtle"
     },
     "adminPassword": {
       "value": null

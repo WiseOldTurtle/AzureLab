@@ -4,7 +4,7 @@
   "parameters": {
     "vnetName": {
       "type": "string",
-      "defaultValue": "VNet1",
+      "defaultValue": "LabEnvironment-vnet",
       "metadata": {
         "description": "VNet name"
       }

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
@@ -8,11 +8,30 @@
     "networkInterfaceName": {
       "value": "winserv-vnic"
     },
-    "subnetName": {
-      "value": "Subnet1"
+    "networkSecurityGroupName": {
+      "value": "WinServ-nsg"
     },
-    "virtualNetworkId": {
-      "value": "/subscriptions/dee63b58-8ba6-46f7-81bc-3613f27c8b88/resourceGroups/LabEnvironment/providers/Microsoft.Network/virtualNetworks/LabEnvironment-vnet"
+    "networkSecurityGroupRules": {
+      "value": []
+    },
+    "subnetName": {
+      "value": "default"
+    },
+    "virtualNetworkName": {
+      "value": "LabEnvironment-vnet"
+    },
+    "addressPrefixes": {
+      "value": ["10.0.1.0/24"]
+    },
+    "subnets": {
+      "value": [
+        {
+          "name": "default",
+          "properties": {
+            "addressPrefix": "10.1.0.0/24"
+          }
+        }
+      ]
     },
     "virtualMachineName": {
       "value": "WinServ"
@@ -30,7 +49,7 @@
       "value": "Standard_B1s"
     },
     "adminUsername": {
-      "value": "wiseoldturtle"
+      "value": "WiseOldTurtle"
     },
     "adminPassword": {
       "value": null

@@ -24,7 +24,7 @@
       }
     },
     "variables": {
-      "storageAccountName": "store-wotlab01"
+      "storageAccountName": "wiseoldturtlestorage01"
     },
     "resources": [
       {

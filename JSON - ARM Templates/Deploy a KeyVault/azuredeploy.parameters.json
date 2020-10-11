@@ -6,16 +6,25 @@
             "value": "WOTLAB-kv"
         },
         "location": {
-            "value": "ukwest"
+            "value": "uksouth"
         },
         "sku": {
             "value": "Standard"
+        },
+        "objectId": {
+            "value": "3ca1aa0c-950a-4e8b-b00f-ab3ab0a13d8c"
+          },
+        "secretName": {
+            "value": "WindowsVMPass"
+        },
+        "secretValue": {
+            "value": "@gBeMnO0Qnca"
         },
         "accessPolicies": {
             "value": [
                 {
                     "objectId": "3ca1aa0c-950a-4e8b-b00f-ab3ab0a13d8c",
-                    "tenantId": "33c90149-5e62-4acc-81f8-ebcd6591227f",
+                    "tenantId": "dee63b58-8ba6-46f7-81bc-3613f27c8b88",
                     "permissions": {
                         "keys": [
                             "Get",
@@ -68,7 +77,7 @@
             ]
         },
         "tenant": {
-            "value": "33c90149-5e62-4acc-81f8-ebcd6591227f"
+            "value": "dee63b58-8ba6-46f7-81bc-3613f27c8b88"
         },
         "enabledForDeployment": {
             "value": false

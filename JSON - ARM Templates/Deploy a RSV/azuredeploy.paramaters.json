@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "RSV-IMLAB-01"
+      "value": "RSV-wotlab-01"
     },
     "location": {
-      "value": ""
+      "value": "UK South"
     }
   }
 }

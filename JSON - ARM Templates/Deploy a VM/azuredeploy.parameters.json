@@ -33,7 +33,12 @@
             "value": "wiseoldturtle"
         },
         "adminPassword": {
-            "value": null
+            "reference": {
+                "keyVault": {
+                "id": "/subscriptions/<SubscriptionID>/resourceGroups/mykeyvaultdeploymentrg/providers/Microsoft.KeyVault/vaults/<KeyVaultName>"
+                },
+                "secretName": "vmAdminPassword"
+            }
         },
         "patchMode": {
             "value": "AutomaticByOS"

@@ -12,7 +12,7 @@
             "value": "Subnet1"
         },
         "virtualNetworkId": {
-            "value": "/subscriptions/dee63b58-8ba6-46f7-81bc-3613f27c8b88/resourceGroups/LabEnvironment/providers/Microsoft.Network/virtualNetworks/LabEnvironment-vnet"
+            "value": "/subscriptions/dee63b58-8ba6-46f7-81bc-3613f27c8b88/resourceGroups/rg-vnet/providers/Microsoft.Network/virtualNetworks/wotlab01-vnet"
         },
         "virtualMachineName": {
             "value": "WinServ"

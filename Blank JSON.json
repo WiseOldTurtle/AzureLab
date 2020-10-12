@@ -1,0 +1,12 @@
+"variables": {
+    "secretsObject" : [
+        {
+            "secretName": "AdminAccountName",
+            "secretValue": "WiseOldTurtle"
+        },
+        {
+            "secretName": "AdminAccountPassword",
+            "secretValue": "@gBeMnO0Qnca"
+        }
+    ]
+}

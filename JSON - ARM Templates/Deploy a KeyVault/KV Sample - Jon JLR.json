@@ -7,16 +7,26 @@
         }
     },
     "variables": {
-        "kvName": "WOTLAB-kv",
-
+        "rsgElements" : "[split(resourceGroup().name,'-')]",
+        "rsgPrefix" : "[concat(variables('rsgElements')[0],variables('rsgElements')[1],variables('rsgElements')[2],variables('rsgElements')[3])]",
+        "kvName" : "[concat(variables('rsgPrefix'),'kvt01')]",
+        "backupServiceID" : "6cfd53a8-c3d6-4b02-ab5c-bde093e8e6c5",
         "secretsObject" : [
             {
                 "secretName": "AdminAccountName",
-                "secretValue": "WiseOldTurtle"
+                "secretValue": "********88"
             },
             {
                 "secretName": "AdminAccountPassword",
-                "secretValue": "@gBeMnO0Qnca"
+                "secretValue": "********"
+            },
+            {
+                "secretName": "domainUsername",
+                "secretValue": "**********"
+            },
+            {
+                "secretName": "domainPassword",
+                "secretValue": "********"
             }
         ]
     },
@@ -32,7 +42,8 @@
                 "enabledForTemplateDeployment": true,
                 "tenantId": "[subscription().tenantId]",
                 "sku": {
-                    "name": "Standard"
+                    "name": "Standard",
+                    "family": "A"
                 },
                 "accessPolicies": [
                     {
@@ -52,8 +63,23 @@
                                 "all"
                             ]
                         }
+                    },
+                    {
+                        "objectId": "[variables('backupServiceID')]",
+                        "tenantId": "[subscription().tenantId]",
+                        "permissions": {
+                            "keys": [
+                                "Get",
+                                "List",
+                                "Backup"
+                            ],
+                            "secrets": [
+                                "Get",
+                                "List",
+                                "Backup"
+                            ]
+                        }
                     }
-                   
                 ]
             }
         },

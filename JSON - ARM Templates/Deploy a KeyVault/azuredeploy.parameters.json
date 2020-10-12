@@ -2,41 +2,12 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-      "keyVaultName": {
-            "value": "WOTLAB-kv"
-          },
-          "objectId": {
-            "value": "3ca1aa0c-950a-4e8b-b00f-ab3ab0a13d8c"
-          },
-          "secretName": {
-            "value": "WindowsVMPass"
-          },
-          "secretValue": {
-            "value": "@gBeMnO0Qnca"
-          },
-          "keysPermissions": {
-            "value": [
-              "Get",
-              "List",
-              "Update",
-              "Create",
-              "Import",
-              "Recover",
-              "Backup",
-              "Restore"
-            ]
-          },
-            "secretsPermissions": {
-                "value" : [
-              "Get",
-              "List",
-              "Set",
-              "Recover",
-              "Backup",
-              "Restore"
-            ]
-          }
-          }
-        }
+    "userID": {
+      "value": "Insert Object ID",
+      "metadata": {
+           "description": "description"
+       }
+   }
+  }
+        
 

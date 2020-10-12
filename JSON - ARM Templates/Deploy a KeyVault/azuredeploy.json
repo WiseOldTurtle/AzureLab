@@ -25,14 +25,15 @@
             "type": "Microsoft.KeyVault/vaults",
             "name": "[variables('kvName')]",
             "apiVersion": "2015-06-01",
-            "location": "[resourceGroup().location]",
+            "location": "UK South",
             "properties": {
                 "enabledForDeployment": false,
                 "enabledForDiskEncryption": true,
                 "enabledForTemplateDeployment": true,
                 "tenantId": "[subscription().tenantId]",
                 "sku": {
-                    "name": "Standard"
+                    "name": "Standard",
+                    "family" : "A"
                 },
                 "accessPolicies": [
                     {
@@ -56,21 +57,21 @@
                    
                 ]
             }
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "name": "[concat(variables('kvName'), '/', variables('secretsObject')[copyIndex()].secretName)]",
-            "apiVersion": "2015-06-01",
-            "dependsOn": [
-                "[concat('Microsoft.KeyVault/vaults/', variables('kvName'))]"
-            ],
-            "copy": {
-                "name": "secretsCopy",
-                "count": "[length(variables('secretsObject'))]"
-                },
-            "properties": {
-                "value": "[variables('secretsObject')[copyIndex()].secretValue]"
-            }
         }
+       //  {
+       //     "type": "Microsoft.KeyVault/vaults/secrets",
+       //     "name": "[concat(variables('kvName'), '/', variables('secretsObject')[copyIndex()].secretName)]",
+       //     "apiVersion": "2015-06-01",
+       //     "dependsOn": [
+       //         "[concat('Microsoft.KeyVault/vaults/', variables('kvName'))]"
+       //     ],
+       //     "copy": {
+       //         "name": "secretsCopy",
+       //         "count": "[length(variables('secretsObject'))]"
+       //         },
+       //     "properties": {
+       //         "value": "[variables('secretsObject')[copyIndex()].secretValue]"
+       //     }
+       //  }
     ]
 }

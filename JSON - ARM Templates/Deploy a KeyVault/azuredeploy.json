@@ -7,7 +7,7 @@
         }
     },
     "variables": {
-        "kvName": "WOTLAB-kv",
+        "kvName": "kv-wotlab01",
 
         "secretsObject" : [
             {

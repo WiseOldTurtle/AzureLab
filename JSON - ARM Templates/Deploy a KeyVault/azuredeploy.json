@@ -35,7 +35,8 @@
                     "name": "Standard",
                     "family" : "A"
                 },
-                "accessPolicies": [
+                "accessPolicies": { 
+                    "value": [
                     {
                         "objectId": "[parameters('userId')]",
                         "tenantId": "dee63b58-8ba6-46f7-81bc-3613f27c8b88",

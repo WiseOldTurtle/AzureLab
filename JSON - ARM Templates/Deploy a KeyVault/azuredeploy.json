@@ -48,10 +48,8 @@
                             ],
                             "certificates": [
                                 "all"
-                            ],
-                            "storage": [
-                                "all"
                             ]
+                          
                         }
                     }
                    

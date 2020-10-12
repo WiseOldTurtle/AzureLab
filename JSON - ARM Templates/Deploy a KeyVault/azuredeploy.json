@@ -38,7 +38,7 @@
                 "accessPolicies": [
                     {
                         "objectId": "[parameters('userId')]",
-                        "tenantId": "[subscription().tenantId]",
+                        "tenantId": "dee63b58-8ba6-46f7-81bc-3613f27c8b88",
                         "permissions": {
                             "keys": [
                                 "all"

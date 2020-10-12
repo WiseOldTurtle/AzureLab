@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "keyVaultName": {
-        "value": "KV-UKS-WOTLAB01"
+        "value": "wiseoldturtle-kv"
       },
       "objectId": {
         "value": "3ca1aa0c-950a-4e8b-b00f-ab3ab0a13d8c"

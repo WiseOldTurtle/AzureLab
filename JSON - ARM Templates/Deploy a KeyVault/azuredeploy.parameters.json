@@ -14,7 +14,29 @@
           },
           "secretValue": {
             "value": "@gBeMnO0Qnca"
+          },
+          "keysPermission": {
+            "value": [
+              "Get",
+              "List",
+              "Update",
+              "Create",
+              "Import",
+              "Recover",
+              "Backup",
+              "Restore"
+            ]
+          },
+            "secretsPermissions": {
+                "value" : [
+              "Get",
+              "List",
+              "Set",
+              "Recover",
+              "Backup",
+              "Restore"
+            ]
+          }
           }
         }
-      }
-    
+

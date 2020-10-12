@@ -35,23 +35,43 @@
                     "name": "Standard",
                     "family" : "A"
                 },
-                "accessPolicies": { 
-                    "value": [
-                    {
-                        "objectId": "[parameters('userId')]",
-                        "tenantId": "dee63b58-8ba6-46f7-81bc-3613f27c8b88",
-                        "permissions": {
-                            "keys": [
-                                "all"
-                            ],
-                            "secrets": [
-                                "all"
-                            ],
-                            "certificates": [
-                                "all"
-                            ]
-                          
-                        }
+                "accessPolicies":
+                 [
+                {
+          "objectId": "fa989505-a176-4903-b45d-b35138b58d30",
+          "tenantId": "97af0b54-9d7a-4131-a899-1af1880a5d22",
+          "permissions": {
+            "keys": [
+              "Get",
+              "List",
+              "Update",
+              "Create",
+              "Import",
+              "Backup",
+              "Restore"
+            ],
+            "secrets": [
+              "Get",
+              "List",
+              "Set"
+            ],
+            "certificates": [
+              "Get",
+              "List",
+              "Update",
+              "Create",
+              "Import",
+              "Recover",
+              "Backup",
+              "Restore",
+              "ManageContacts",
+              "ManageIssuers",
+              "GetIssuers",
+              "ListIssuers",
+              "SetIssuers",
+              "DeleteIssuers"
+            ]
+          }
                     }
                    
                 ]

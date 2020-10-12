@@ -1,13 +1,78 @@
 
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
-    "userID": {
-      "value": "Insert Object ID",
-      "metadata": {
-           "description": "description"
-       }
-   }
+    "parameters": {
+       "location": {
+        "value": "uksouth"
+      },
+      "ade": {
+        "value": false
+      },
+      "templatedeployment": {
+        "value": true
+      },
+      "accessPolicies": {
+        "value": [
+          {
+            "objectId": "fa989505-a176-4903-b45d-b35138b58d30",
+            "tenantId": "97af0b54-9d7a-4131-a899-1af1880a5d22",
+            "permissions": {
+              "keys": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Recover",
+                "Backup",
+                "Restore"
+              ],
+              "secrets": [
+                "Get",
+                "List",
+                "Set",
+                "Recover",
+                "Backup",
+                "Restore"
+              ],
+              "certificates": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Recover",
+                "Backup",
+                "Restore",
+                "ManageContacts",
+                "ManageIssuers",
+                "GetIssuers",
+                "ListIssuers",
+                "SetIssuers",
+                "DeleteIssuers"
+              ]
+            }
+          }
+        ]
+      },
+      "tenant": {
+        "value": "97af0b54-9d7a-4131-a899-1af1880a5d22"
+      },
+  
+      //"softDeleteRetentionInDays": {
+       // "value": 90
+    //  },
+      "networkAcls": {
+        "value": {
+          "defaultAction": "allow",
+          "bypass": "AzureServices",
+          "ipRules": [],
+          "virtualNetworkRules": []
+        }
+      },
+      "kvname": {
+        "value": "KV-UKS-WOTLAB01"
+      }
+    }
   }
-        
-

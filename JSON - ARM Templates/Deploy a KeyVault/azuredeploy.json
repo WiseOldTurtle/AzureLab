@@ -2,13 +2,30 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "2.0.0.0",
     "parameters": {
-        "userID" : {
-            "type" : "string"
-        }
+    "kvname": {
+      "type": "string"
     },
-    "variables": {
-        "kvName": "kv-wotlab01",
+    "templatedeployment": {
+      "type": "bool"
+    },
+    "location": {
+      "type": "string"
+    },
+    "ade": {
+      "type": "bool"
+    },
+    "accessPolicies": {
+      "type": "array"
+    },
+    "tenant": {
+      "type": "string"
+    },
+    "networkAcls": {
+      "type": "object"
+    }
+  },
 
+    "variables": {
         "secretsObject" : [
             {
                 "secretName": "AdminAccountName",
@@ -21,62 +38,31 @@
         ]
     },
     "resources": [
-        {
-            "type": "Microsoft.KeyVault/vaults",
-            "name": "[variables('kvName')]",
-            "apiVersion": "2015-06-01",
-            "location": "UK South",
-            "properties": {
-                "enabledForDeployment": false,
-                "enabledForDiskEncryption": true,
-                "enabledForTemplateDeployment": true,
-                "tenantId": "[subscription().tenantId]",
-                "sku": {
-                    "name": "Standard",
-                    "family" : "A"
-                },
-                "accessPolicies":
-                 [
-                {
-          "objectId": "fa989505-a176-4903-b45d-b35138b58d30",
-          "tenantId": "97af0b54-9d7a-4131-a899-1af1880a5d22",
-          "permissions": {
-            "keys": [
-              "Get",
-              "List",
-              "Update",
-              "Create",
-              "Import",
-              "Backup",
-              "Restore"
-            ],
-            "secrets": [
-              "Get",
-              "List",
-              "Set"
-            ],
-            "certificates": [
-              "Get",
-              "List",
-              "Update",
-              "Create",
-              "Import",
-              "Recover",
-              "Backup",
-              "Restore",
-              "ManageContacts",
-              "ManageIssuers",
-              "GetIssuers",
-              "ListIssuers",
-              "SetIssuers",
-              "DeleteIssuers"
-            ]
-          }
-                    }
-                   
-                ]
-            }
-        }
+    {
+      "apiVersion": "2019-09-01",
+      "name": "[parameters('kvname')]",
+      "location": "[parameters('location')]",
+      "type": "Microsoft.KeyVault/vaults",
+      "properties": {
+        "enabledForDeployment": "[parameters('templatedeployment')]",
+        "enabledForTemplateDeployment": "[parameters('templatedeployment')]",
+        "enabledForDiskEncryption": "[parameters('ade')]",
+        //"enableRbacAuthorization": true,
+        "accessPolicies": "[parameters('accessPolicies')]",
+        "tenantId": "[parameters('tenant')]",
+        "sku": {
+          "name": "standard",
+          "family": "A"
+        },
+        "enableSoftDelete": false,
+        //"softDeleteRetentionInDays": "[parameters('softDeleteRetentionInDays')]",
+        "networkAcls": "[parameters('networkAcls')]"
+      },
+      "dependsOn": []
+    }
+  ],
+  "outputs": {}
+}
        //  {
        //     "type": "Microsoft.KeyVault/vaults/secrets",
        //     "name": "[concat(variables('kvName'), '/', variables('secretsObject')[copyIndex()].secretName)]",
@@ -92,5 +78,3 @@
        //         "value": "[variables('secretsObject')[copyIndex()].secretValue]"
        //     }
        //  }
-    ]
-}

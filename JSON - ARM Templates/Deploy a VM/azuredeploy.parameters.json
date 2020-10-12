@@ -35,9 +35,9 @@
         "adminPassword": {
             "reference": {
                 "keyVault": {
-                "id": "/subscriptions/<SubscriptionID>/resourceGroups/mykeyvaultdeploymentrg/providers/Microsoft.KeyVault/vaults/<KeyVaultName>"
+                "id": "/subscriptions/dee63b58-8ba6-46f7-81bc-3613f27c8b88/resourceGroups/rg-kv-wotlab01/providers/Microsoft.KeyVault/vaults/KV-UKS-WOTLAB01"
                 },
-                "secretName": "vmAdminPassword"
+                "secretName": "AdminAccountPassword"
             }
         },
         "patchMode": {

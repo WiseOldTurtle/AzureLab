@@ -15,7 +15,7 @@
           "secretValue": {
             "value": "@gBeMnO0Qnca"
           },
-          "keysPermission": {
+          "keysPermissions": {
             "value": [
               "Get",
               "List",

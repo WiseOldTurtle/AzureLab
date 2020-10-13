@@ -5,11 +5,11 @@
         "location": {
             "value": "uksouth"
         },
-        "networkInterfaceName": {
-            "value": "winserv475"
-        },
         "subnetName": {
             "value": "Subnet1"
+        },
+        "virtualNetworkName": {
+            "value": "value"
         },
         "virtualNetworkId": {
             "value": "/subscriptions/dee63b58-8ba6-46f7-81bc-3613f27c8b88/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/hub-wotlab01-vnet"
@@ -17,22 +17,10 @@
         "virtualMachineName": {
             "value": "WinServ"
         },
-        "virtualMachineComputerName": {
-            "value": "WinServ"
+        "vnetname": {
+            "value": "hub-wotlab01-vnet"
         },
-        "virtualMachineRG": {
-            "value": "rg-vm-wotlab01"
-        },
-        "osDiskType": {
-            "value": "Standard_LRS"
-        },
-        "virtualMachineSize": {
-            "value": "Standard_B1s"
-        },
-        "adminUsername": {
-            "value": "wiseoldturtle"
-        },
-        "adminPassword": {
+        "AdminPassword": {
             "reference": {
                 "keyVault": {
                 "id": "/subscriptions/dee63b58-8ba6-46f7-81bc-3613f27c8b88/resourceGroups/rg-kv-wotlab01/providers/Microsoft.KeyVault/vaults/KV-UKS-WOTLAB01"

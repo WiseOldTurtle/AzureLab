@@ -8,9 +8,6 @@
         "subnetName": {
             "value": "Subnet1"
         },
-        "virtualNetworkId": {
-            "value": "/subscriptions/dee63b58-8ba6-46f7-81bc-3613f27c8b88/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/hub-vnet-wotlab01"
-        },
         "virtualNetworkResourceGroup": {
             "value": "rg-vnet-wotlab01"
         },

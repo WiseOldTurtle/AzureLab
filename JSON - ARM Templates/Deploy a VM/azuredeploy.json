@@ -33,12 +33,6 @@
         "description": "Specifies the static portion of the name for each VM.  Maximum length is 13, to allow for a numeric suffix for Virtual Machine Names."
       }
     },
-    "virtualNetworkName": {
-      "type": "string",
-      "metadata": {
-        "description": "Specifies the name of the vNet which the VM(s) will be attached to."
-      }
-    },
     "virtualNetworkResourceGroup": {
       "type": "string",
       "metadata": {

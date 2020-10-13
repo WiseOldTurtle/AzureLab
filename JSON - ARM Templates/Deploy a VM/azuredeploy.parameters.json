@@ -8,12 +8,6 @@
         "subnetName": {
             "value": "Subnet1"
         },
-        "virtualNetworkName": {
-            "value": "value"
-        },
-        "virtualNetworkId": {
-            "value": "/subscriptions/dee63b58-8ba6-46f7-81bc-3613f27c8b88/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/hub-wotlab01-vnet"
-        },
         "virtualNetworkResourceGroup": {
             "value": "rg-vnet-wotlab01"
         },
@@ -30,9 +24,6 @@
                 },
                 "secretName": "AdminAccountPassword"
             }
-        },
-        "patchMode": {
-            "value": "AutomaticByOS"
         }
     }
 }

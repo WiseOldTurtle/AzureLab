@@ -21,7 +21,7 @@
             "value": "WinServ"
         },
         "virtualMachineRG": {
-            "value": "LabEnvironment"
+            "value": "rg-vm-wotlab01"
         },
         "osDiskType": {
             "value": "Standard_LRS"

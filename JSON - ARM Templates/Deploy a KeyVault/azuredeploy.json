@@ -19,6 +19,9 @@
         "apiVersion": "2015-06-01",
         "location": "UK South",
         "properties": {
+          "enabledForDeployment": false,
+          "enabledForDiskEncryption": true,
+          "enabledForTemplateDeployment": true,
           "sku": {
             "family": "A",
             "name": "Standard"

@@ -18,7 +18,7 @@
             "value": "WinServ"
         },
         "virtualNetworkName": {
-            "value": "hub-wotlab01-vnet01"
+            "value": "hub-vnet-wotlab01"
         },
         "AdminPassword": {
             "reference": {

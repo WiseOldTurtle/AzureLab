@@ -11,8 +11,8 @@
       "subnets": {
         "value": [
             {
-                "name": "AzureBastionSubnet",
-                "addressPrefix": "10.0.0.0/24"
+            "name": "AzureBastionSubnet",
+            "addressPrefix": "10.0.0.0/24"
             
               },
             {

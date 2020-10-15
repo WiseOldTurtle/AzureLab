@@ -60,9 +60,9 @@
     "NSGBastion": {
       "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNSGName'))]"
     },
-    "NSG1Name": "[concat('NSG-',parameters('subnet1Name'))]",
-    "NSG2Name": "[concat('NSG-',parameters('subnet2Name'))]",
-    "NSG3Name": "[concat('NSG-',parameters('subnet3Name'))]",
+    // "NSG1Name": "[concat('NSG-',parameters('subnet1Name'))]",
+    // "NSG2Name": "[concat('NSG-',parameters('subnet2Name'))]",
+    // "NSG3Name": "[concat('NSG-',parameters('subnet3Name'))]",
     "bastionIPName": "[concat('PIP-','AzureBastionSubnet')]",
     "bastionNSGName": "[concat('NSG-','AzureBastionSubnet')]",
     "nsgvar": "[parameters('subnets')[copyIndex('subnets')].nsgname]",

@@ -1,10 +1,10 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "rgName": {
+    "environment": {
       "type": "string",
-      "defaultValue": "testing"
+      "defaultValue": "wotlab01"
     },
     "createVirtualNetwork": {
       "type": "string",
@@ -16,7 +16,7 @@
     },
     "virtualNetworkName": {
       "type": "string",
-      "defaultValue": "[concat(parameters('rgName'), '-vnet')]"
+      "defaultValue": "[concat(parameters('environment'), '-vnet')]"
     },
     "vnetAddressPrefix": {
       "type": "string",
@@ -24,7 +24,7 @@
     },
     "subnetName": {
       "type": "string",
-      "defaultValue": "[concat(parameters('rgName'),'-subnet2')]"
+      "defaultValue": "[concat(parameters('environment'),'-subnet')]"
     },
     "subnetAddressPrefix": {
       "type": "string",
@@ -34,7 +34,8 @@
   "variables": {
     "createVirtualNetwork": "[equals(parameters('createVirtualNetwork'), 'yes')]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-    "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('subnetName'))]"
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('subnetName'))]",
+    "location" : " UK South"
   },
   "resources": [
     {
@@ -42,7 +43,7 @@
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[parameters('virtualNetworkName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[variables('location')]",
       "dependsOn": [],
       "properties": {
         "addressSpace": {

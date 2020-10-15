@@ -1,107 +1,151 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "rgName": {
+    "vnetName": {
       "type": "string",
-      "defaultValue": "testing"
-    },
-    "createVirtualNetwork": {
-      "type": "string",
-      "defaultValue": "yes",
-      "allowedValues": [
-        "yes",
-        "no"
-      ]
-    },
-    "virtualNetworkName": {
-      "type": "string",
-      "defaultValue": "[concat(parameters('rgName'), '-vnet')]"
+      "defaultValue": "VNet1",
+      "metadata": {
+        "description": "VNet name"
+      }
     },
     "vnetAddressPrefix": {
       "type": "string",
-      "defaultValue": "10.0.0.0/16"
+      "defaultValue": "10.0.0.0/16",
+      "metadata": {
+        "description": "Address prefix"
+      }
     },
-    "subnetName": {
-      "type": "string",
-      "defaultValue": "[concat(parameters('rgName'),'-subnet2')]"
+    "subnets": {
+      "type": "array",
+      "metadata": {
+        "description": "description"
+      }
     },
-    "subnetAddressPrefix": {
+    "azureBastion": {
       "type": "string",
-      "defaultValue": "10.0.101.0/24"
+      "metadata": {
+        "description": "Please type 'yes' for Azure Bastion deployment"
+      }
+    },
+    "azureBastionName": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Bastion Name"
+      }
+    },
+    "networkSecurityGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Please type 'yes' for NSG deployment"
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location for all resources."
+      }
     }
   },
   "variables": {
-    "createVirtualNetwork": "[equals(parameters('createVirtualNetwork'), 'yes')]",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-    "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('subnetName'))]"
+    "NSG1": {
+      "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG1Name'))]"
+    },
+    "NSG2": {
+      "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG2Name'))]"
+    },
+    "NSG3": {
+      "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG3Name'))]"
+    },
+    "NSGBastion": {
+      "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNSGName'))]"
+    },
+    "NSG1Name": "[concat('NSG-',parameters('subnet1Name'))]",
+    "NSG2Name": "[concat('NSG-',parameters('subnet2Name'))]",
+    "NSG3Name": "[concat('NSG-',parameters('subnet3Name'))]",
+    "bastionIPName": "[concat('PIP-','AzureBastionSubnet')]",
+    "bastionNSGName": "[concat('NSG-','AzureBastionSubnet')]",
+    "nsgvar": "[parameters('subnets')[copyIndex('subnets')].nsgname]",
+    "APIComputevirtualMachines": "[providers('Microsoft.Compute','virtualMachines').apiVersions[0]]",
+    "APIComputevirtualMachinesExt": "[providers('Microsoft.Compute','virtualMachines/extensions').apiVersions[0]]",
+    "APIComputeavailabilitySets": "[providers('Microsoft.Compute','availabilitySets').apiVersions[0]]",
+    "APIResourcesDeployments": "[providers('Microsoft.Resources','deployments').apiVersions[0]]",
+    "APINetworkpublicIPAddresses": "[providers('Microsoft.Network','publicIPAddresses').apiVersions[0]]",
+    "APINetworkvirtualNetworks": "[providers('Microsoft.Network','virtualNetworks').apiVersions[0]]",
+    "APINetworkvirtualNetworkSecurityGroups": "[providers('Microsoft.Network','networkSecurityGroups').apiVersions[0]]",
+    "APINetworkvirtualNetworkGateways": "[providers('Microsoft.Network','virtualNetworkGateways').apiVersions[0]]",
+    "APINetworklocalNetworkGateways": "[providers('Microsoft.Network','localNetworkGateways').apiVersions[0]]",
+    "APINetworkrouteTables": "[providers('Microsoft.Network','routeTables').apiVersions[0]]",
+    "APINetworkFirewall": "[providers('Microsoft.Network','azureFirewalls').apiVersions[0]]",
+    "APINetworkconnections": "[providers('Microsoft.Network','connections').apiVersions[0]]",
+    //"APINetworkvirtualNetworkPeerings": "[providers('Microsoft.Network','virtualNetworks/virtualNetworkPeerings').apiVersions[0]]",
+    "APINetworkloadBalancers": "[providers('Microsoft.Network','loadBalancers').apiVersions[0]]",
+    "APIStoragestorageAccounts": "[providers('Microsoft.Storage','storageAccounts').apiVersions[0]]"
   },
   "resources": [
     {
-      "condition": "[variables('createVirtualNetwork')]",
-      "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/virtualNetworks",
-      "name": "[parameters('virtualNetworkName')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [],
+      "apiVersion": "[variables('APINetworkvirtualNetworks')]",
+      "name": "[parameters('vnetName')]",
+      "location": "[parameters('location')]",
       "properties": {
         "addressSpace": {
-          "addressPrefixes": [
-            "[parameters('vnetAddressPrefix')]"
-          ]
+          "addressPrefixes": ["[parameters('vnetAddressPrefix')]"]
         },
-        "subnets": [
+        "copy": [
           {
-            "name": "[parameters('subnetName')]",
-            "properties": {
-              "mode": "Incremental",
-              "addressPrefix": "[parameters('subnetAddressPrefix')]"
+            "name": "subnets",
+            "count": "[length(parameters('subnets'))]",
+            "input": {
+              "name": "[parameters('subnets')[copyIndex('subnets')].name]",
+              "properties": {
+                "addressPrefix": "[parameters('subnets')[copyIndex('subnets')].addressPrefix]"
+              }
             }
           }
-        ],
-        "virtualNetworkPeerings": []
+        ]
+        //  "networkSecurityGroup": "[if(equals(parameters('networkSecurityGroup'),'yes'),variables('NSG3'),json('null'))]"
       }
     },
     {
-      "type": "Microsoft.Network/virtualNetworks/subnets",
-      "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'))]",
-      "apiVersion": "2017-06-01",
-      "properties": {
-        "addressPrefix": "[parameters('subnetAddressPrefix')]",
-        "privateAccessServices": []
-      },
+      "type": "Microsoft.Network/bastionHosts",
+      "apiVersion": "2019-04-01",
+      "name": "[parameters('azureBastionName')]",
+      "condition": "[equals(parameters('azureBastion'), 'yes')]",
+      "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
-      ]
-    },
-    {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(parameters('virtualNetworkName'), '-interface2')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'), '/subnets/', parameters('subnetName'))]"
+        "[resourceId('Microsoft.Network/publicIpAddresses', variables('bastionIPname'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
       ],
       "properties": {
         "ipConfigurations": [
           {
-            "name": "ipconfig1",
+            "name": "AzureBastion",
             "properties": {
-              /*
-              "privateIPAllocationMethod": "Static",
-              // reserved IP address range for /24 is 1-3, so start with [0 + 4] or more
-              "privateIPAddress": "[parameters('vmIP')]",
-              */
-              "privateIPAllocationMethod": "Dynamic",
               "subnet": {
-                "id": "[variables('subnetRef')]"
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), 'AzureBastionSubnet')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('bastionIPName'))]"
               }
             }
           }
         ]
       }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2019-04-01",
+      "name": "[variables('bastionIpName')]",
+      "condition": "[equals(parameters('azureBastion'), 'yes')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "publicIPAddressVersion": "IPv4"
+      }
     }
-  ],
-  "outputs": {}
+  ]
 }

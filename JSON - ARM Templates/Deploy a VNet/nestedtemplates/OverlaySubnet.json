@@ -1,108 +1,72 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "environment": {
-      "type": "string",
-      "defaultValue": "wotlab01"
-    },
-    "createVirtualNetwork": {
-      "type": "string",
-      "defaultValue": "yes",
-      "allowedValues": [
-        "yes",
-        "no"
-      ]
-    },
-    "virtualNetworkName": {
-      "type": "string",
-      "defaultValue": "[concat(parameters('environment'), '-vnet')]"
-    },
-    "vnetAddressPrefix": {
-      "type": "string",
-      "defaultValue": "10.0.0.0/16"
-    },
-    "subnetName": {
-      "type": "string",
-      "defaultValue": "[concat(parameters('environment'),'-subnet')]"
-    },
-    "subnetAddressPrefix": {
-      "type": "string",
-      "defaultValue": "10.0.101.0/24"
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "0.0.0.1",
+    "parameters": {
+        "ParameterArray": {
+            "value": [
+                {
+                    "VnetName": "VnetInSubA",
+                    "ResourceGroupName": "RgInSubA",
+                    "SubscriptionId": "ffffffff-0000-0000-0000-aaaaaaaaaaaa",
+                    "VnetAddressSpace": "10.66.0.0/16",
+                    "Region": "eastus2",
+                    "Subnets": [
+                        {
+                            "name": "subnet-10-66-1-0-24",
+                            "addressPrefix": "10.66.1.0/24"
+                        },
+                        {
+                            "name": "subnet-10-66-1-0-24",
+                            "addressPrefix": "10.66.2.0/24"
+                        },
+                        {
+                            "name": "subnet-10-66-3-0-24",
+                            "addressPrefix": "10.66.3.0/24"
+                        },
+                        {
+                            "name": "subnet-10-66-4-0-24",
+                            "addressPrefix": "10.66.4.0/24"
+                        },
+                        {
+                            "name": "subnet-10-66-5-0-24",
+                            "addressPrefix": "10.66.5.0/24"
+                        }
+                    ]
+                },
+                {
+                    "VnetName": "VnetInSubB",
+                    "ResourceGroupName": "RgInSubB",
+                    "SubscriptionId": "ffffffff-0000-0000-0000-bbbbbbbbbbbb",
+                    "VnetAddressSpace": "10.64.0.0/16",
+                    "Region": "eastus",
+                    "Subnets": [
+                        {
+                            "name": "subnet-10-64-1-0-slash-24",
+                            "addressPrefix": "10.64.1.0/24"
+                        },
+                        {
+                            "name": "subnet-10-64-2-0-slash-24",
+                            "addressPrefix": "10.64.2.0/24"
+                        },
+                        {
+                            "name": "subnet-10-64-3-0-slash-24",
+                            "addressPrefix": "10.64.3.0/24"
+                        },
+                        {
+                            "name": "subnet-10-64-4-0-slash-24",
+                            "addressPrefix": "10.64.4.0/24"
+                        },
+                        {
+                            "name": "subnet-10-64-5-0-slash-24",
+                            "addressPrefix": "10.64.5.0/24"
+                        },
+                        {
+                            "name": "subnet-10-64-6-0-slash-24",
+                            "addressPrefix": "10.64.6.0/24"
+                        }
+                    ]
+                }
+            ]
+        }
     }
-  },
-  "variables": {
-    "createVirtualNetwork": "[equals(parameters('createVirtualNetwork'), 'yes')]",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-    "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('subnetName'))]",
-    "location" : " UK South"
-  },
-  "resources": [
-    {
-      "condition": "[variables('createVirtualNetwork')]",
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/virtualNetworks",
-      "name": "[parameters('virtualNetworkName')]",
-      "location": "[variables('location')]",
-      "dependsOn": [],
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[parameters('vnetAddressPrefix')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[parameters('subnetName')]",
-            "properties": {
-              "mode": "Incremental",
-              "addressPrefix": "[parameters('subnetAddressPrefix')]"
-            }
-          }
-        ],
-        "virtualNetworkPeerings": []
-      }
-    },
-    {
-      "type": "Microsoft.Network/virtualNetworks/subnets",
-      "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'))]",
-      "apiVersion": "2017-06-01",
-      "properties": {
-        "addressPrefix": "[parameters('subnetAddressPrefix')]",
-        "privateAccessServices": []
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
-      ]
-    },
-    {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(parameters('virtualNetworkName'), '-interface2')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'), '/subnets/', parameters('subnetName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              /*
-              "privateIPAllocationMethod": "Static",
-              // reserved IP address range for /24 is 1-3, so start with [0 + 4] or more
-              "privateIPAddress": "[parameters('vmIP')]",
-              */
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[variables('subnetRef')]"
-              }
-            }
-          }
-        ]
-      }
-    }
-  ],
-  "outputs": {}
 }

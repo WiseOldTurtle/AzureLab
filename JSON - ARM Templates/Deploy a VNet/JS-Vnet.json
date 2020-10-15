@@ -1,0 +1,156 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "2.0.0.0",
+    "parameters": {
+        "vnetAddressRange" : {
+            "type" : "string"
+        },
+        "subnetList" : {
+            "type" : "array"
+        },
+        "nwPrefix" : {
+            "type" : "string"
+        },
+        "dnsServers" : {
+            "type" : "array",
+            "defaultValue" : []
+        },
+        "nsgName" : {
+            "type" : "string"
+        }
+    },
+    "variables": {
+        "noOfSubnets" : "[length(parameters('subnetList'))]",
+        "apiVersion" : "2018-05-01",
+        "SAStoken" : "[concat('?',split(deployment().properties.templateLink.uri,'?')[1])]",
+        "vnetName" : "[concat(parameters('nwPrefix'),'vnet')]",
+        "udrResIDprefix" : "[concat(resourceGroup().id,'/providers/Microsoft.Network/routeTables/')]",
+        "nsgResourceID" : "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('nsgName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('vnetName')]",
+            "apiVersion": "[variables('apiVersion')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('vnetAddressRange')]"
+                    ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": "[parameters('dnsServers')]"
+                },
+                "copy": [
+                    {
+                        "name": "subnets",
+                        "count": "[length(parameters('subnetList'))]",
+                        "input": {
+                            "name": "[if(equals(parameters('subnetList')[copyIndex('subnets')].subnetName,'GatewaySubnet'),parameters('subnetList')[copyIndex('subnets')].subnetName,concat(parameters('nwPrefix'),parameters('subnetList')[copyIndex('subnets')].subnetName,'-sub'))]",
+                            "properties": {
+                                "addressPrefix": "[parameters('subnetList')[copyIndex('subnets')].subnetAddressRange]",
+                                "networkSecurityGroup" : {
+                                    "id" : "[variables('nsgResourceID')]"
+                                },
+                                "routeTable" :{
+                                    "id" : "[resourceId('Microsoft.Network/routeTables',if(equals(parameters('subnetList')[copyIndex('subnets')].subnetName,'GatewaySubnet'),concat(parameters('nwPrefix'),'gateway','-udr'),concat(parameters('nwPrefix'),parameters('subnetList')[copyIndex('subnets')].subnetName,'-udr')))]"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "2.0.0.0",
+    "parameters" : {
+        "Network": {
+            "type" : "object"
+        },
+        "nwPrefix" : {
+            "type" : "string"
+        }        
+    },
+    "variables": {
+        "apiVersion" : "2018-01-01",
+        "SAStoken" : "[concat('?',split(deployment().properties.templateLink.uri,'?')[1])]",
+        "vnetTemplate": "[concat(uri(deployment().properties.templateLink.uri, 'Deploy_VirtualNetwork.json'),variables('SAStoken'))]",
+        "defaultNsgTemplate" : "[concat(uri(deployment().properties.templateLink.uri, 'Deploy_Default_NSG.json'),variables('SAStoken'))]",
+        "noOfSubnets" : "[length(parameters('Network').subnetList)]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/routeTables",
+            "condition" : "[and(not(contains(parameters('Network').subnetList[copyIndex()].subnetName,'GatewaySubnet')),not(contains(parameters('Network').subnetList[copyIndex()].subnetName,'prvdmz')))]",
+            "name": "[concat(parameters('nwPrefix'),parameters('Network').subnetList[copyIndex()].subnetName,'-udr')]",
+            "location": "[resourceGroup().location]",
+            "copy" : {
+                "name" : "udrCount",
+                "count" : "[variables('noOfSubnets')]"
+            },
+            "properties": {
+                "routes": []
+            }
+        },
+        {    
+            "name": "Deploy_Default_NSG",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion')]",
+            "dependsOn" : [
+                "udrCount"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('defaultNSGTemplate')]",
+                    "contentVersion": "2.0.0.0"
+                },
+                "parameters": {}
+            }
+        },
+        {    
+            "name": "Deploy_Vnet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('apiVersion')]",
+            "dependsOn" : [
+                "Deploy_Default_NSG"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vnetTemplate')]",
+                    "contentVersion": "2.0.0.0"
+                },
+                "parameters": {
+                    "vnetAddressRange": {
+                        "value" : "[parameters('Network').vnetAddressRange]"
+                    },
+                    "subnetList" : {
+                        "value" : "[parameters('Network').subnetList]"                    
+                    },
+                    "nwPrefix" : {
+                        "value" : "[parameters('nwPrefix')]"                            
+                    },
+                    "nsgName" : {
+                        "value" : "[reference('Deploy_Default_NSG').outputs.nsgName.value]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+            "nsgName" : {
+                "type" : "string",
+                "value" : "[reference('Deploy_Default_NSG').outputs.nsgName.value]"
+        }
+
+ 
+
+    }
+}
+        }
+    ]
+}
+

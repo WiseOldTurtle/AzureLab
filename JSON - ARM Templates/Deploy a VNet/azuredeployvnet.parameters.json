@@ -1,28 +1,44 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "location": {
-        "value": "uksouth"
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vnetName": {
+        "value": "VNET-01"
+      },
+      "location": {
+          "value": "UK South" // TODO: Fill in parameter value
+      },
+      "subnets": {
+        "value": [
+            {
+                "name": "AzureBastionSubnet",
+                "addressPrefix": "10.0.0.0/24"
+            
+              },
+            {
+            "name": "Production",
+            "addressPrefix": "10.0.1.0/24"
+         
+          },
+          {
+            "name": "Backend",
+            "addressPrefix": "10.0.2.0/24"
+            
+          },
+          {
+            "name": "Frontend",
+            "addressPrefix": "10.0.3.0/24"
+          }
+        ]
     },
-    "vnetName": {
-        "value": "wotlab01-vnet"
-    },
-    "vnetAddressPrefix": {
-        "value": "10.0.0.0/16"
-    },
-    "subnet1Prefix": {
-        "value": "10.0.0.0/24"
-    },
-    "subnet1Name": {
-        "value": "Subnet1"
-    },
-    "subnet2Prefix": {
-        "value": "10.0.1.0/24"
-    },
-    "subnet2Name": {
-        "value": "Subnet2"
+      "networkSecurityGroup" : {
+        "value": "yes"
+      },
+      "azureBastion": {
+        "value": "yes"
+      },
+      "azureBastionName": {
+        "value": "AzureBastion"
+      }
     }
-
-}
-}
+  }

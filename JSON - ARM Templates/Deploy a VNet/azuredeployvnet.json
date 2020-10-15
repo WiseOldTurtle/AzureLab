@@ -48,18 +48,18 @@
     }
   },
   "variables": {
-    "NSG1": {
-      "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG1Name'))]"
-    },
-    "NSG2": {
-      "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG2Name'))]"
-    },
-    "NSG3": {
-      "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG3Name'))]"
-    },
-    "NSGBastion": {
-      "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNSGName'))]"
-    },
+    //   "NSG1": {
+    //     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG1Name'))]"
+    //   },
+    //   "NSG2": {
+    //     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG2Name'))]"
+    //   },
+    //  "NSG3": {
+    //  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG3Name'))]"
+    //   },
+    //   "NSGBastion": {
+    //     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNSGName'))]"
+    //   },
     // "NSG1Name": "[concat('NSG-',parameters('subnet1Name'))]",
     // "NSG2Name": "[concat('NSG-',parameters('subnet2Name'))]",
     // "NSG3Name": "[concat('NSG-',parameters('subnet3Name'))]",

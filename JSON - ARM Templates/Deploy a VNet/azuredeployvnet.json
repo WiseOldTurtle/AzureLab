@@ -65,7 +65,7 @@
     // "NSG3Name": "[concat('NSG-',parameters('subnet3Name'))]",
     "bastionIPName": "[concat('PIP-','AzureBastionSubnet')]",
     "bastionNSGName": "[concat('NSG-','AzureBastionSubnet')]",
-    "nsgvar": "[parameters('subnets')[copyIndex('subnets')].nsgname]",
+    // "nsgvar": "[parameters('subnets')[copyIndex('subnets')].nsgname]",
     "APIComputevirtualMachines": "[providers('Microsoft.Compute','virtualMachines').apiVersions[0]]",
     "APIComputevirtualMachinesExt": "[providers('Microsoft.Compute','virtualMachines/extensions').apiVersions[0]]",
     "APIComputeavailabilitySets": "[providers('Microsoft.Compute','availabilitySets').apiVersions[0]]",

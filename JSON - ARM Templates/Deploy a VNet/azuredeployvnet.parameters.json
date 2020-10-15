@@ -14,7 +14,7 @@
             "name": "AzureBastionSubnet",
             "addressPrefix": "10.0.0.0/24"
             
-              },
+            },
             {
             "name": "Production",
             "addressPrefix": "10.0.1.0/24"

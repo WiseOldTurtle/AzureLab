@@ -97,7 +97,8 @@
             "name": "subnets",
             "count": "[length(parameters('subnets'))]",
             "input": {
-              "name": "[parameters('subnets')[copyIndex('subnets')].name]",
+              "name": "[if(equals(parameters('subnets')[copyIndex('subnets')].subnetName,'GatewaySubnet'),parameters('subnets')[copyIndex('subnets')].subnetName,concat('sn-',parameters('subnets')[copyIndex('subnets')].subnetName,'-sub'))]",
+              // "name": "[parameters('subnets')[copyIndex('subnets')].name]",
               "properties": {
                 "addressPrefix": "[parameters('subnets')[copyIndex('subnets')].addressPrefix]"
               }

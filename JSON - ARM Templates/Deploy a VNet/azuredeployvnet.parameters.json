@@ -12,22 +12,23 @@
         "value": [
             {
             "name": "AzureBastionSubnet",
-            "addressPrefix": "10.0.0.0/24"
-            
+            "addressPrefix": "10.0.0.0/24",
+            "nsgName" : "Bastion"
             },
             {
             "name": "Production",
-            "addressPrefix": "10.0.1.0/24"
-         
+            "addressPrefix": "10.0.1.0/24",
+            "nsgName" : "Prod"
           },
           {
             "name": "Backend",
-            "addressPrefix": "10.0.2.0/24"
-            
+            "addressPrefix": "10.0.2.0/24",
+            "nsgName" : "Back"
           },
           {
             "name": "Frontend",
-            "addressPrefix": "10.0.3.0/24"
+            "addressPrefix": "10.0.3.0/24",
+            "nsgName" : "Front"
           }
         ]
     },

@@ -86,7 +86,7 @@
     {
       "type": "Microsoft.Network/virtualNetworks",
       "apiVersion": "[variables('APINetworkvirtualNetworks')]",
-      "name": "[parameters('vnetName')]",
+      "name": "[concat(parameters('vnetName') , '-testnet')]",
       "location": "[parameters('location')]",
       "properties": {
         "addressSpace": {
@@ -94,13 +94,25 @@
         },
         "copy": [
           {
-            "name": "subnets",
+            "name": "subnetLoop",
             "count": "[length(parameters('subnets'))]",
             "input": {
-              "name": "[if(equals(parameters('subnets')[copyIndex('subnets')].name,'AzureBastionSubnet'),parameters('subnets')[copyIndex('subnets')].name ,concat('sn-',parameters('subnets')[copyIndex('subnets')].name,'-sub'))]",
+              "name": "[if(equals(parameters('subnets')[copyIndex('subnetLoop')].name,'AzureBastionSubnet'),parameters('subnets')[copyIndex('subnetLoop')].name ,concat('wot-',parameters('subnets')[copyIndex('subnets')].name,'-sub'))]",
               // "name": "[parameters('subnets')[copyIndex('subnets')].name]",
               "properties": {
-                "addressPrefix": "[parameters('subnets')[copyIndex('subnets')].addressPrefix]"
+                "addressPrefix": "[parameters('subnets')[copyIndex('subnetLoop')].addressPrefix]"
+              }
+            }
+          },
+          {
+            "dependsOn": "subnetLoop",
+            "name": "nsgLoop",
+            "count": "[length(parameters('subnets'))]",
+            "input": {
+              "name": "[if(equals(parameters('subnets')[copyIndex('nsgLoop')].name,'Bastion'),parameters('subnets')[copyIndex('nsgLoop')].nsgname ,concat('wot-',parameters('subnets')[copyIndex('nsgLoop')].nsgname,'-nsg'))]",
+              // "name": "[parameters('subnets')[copyIndex('subnets')].name]",
+              "properties": {
+                "addressPrefix": "[parameters('subnets')[copyIndex('nsgLoop')].addressPrefix]"
               }
             }
           }

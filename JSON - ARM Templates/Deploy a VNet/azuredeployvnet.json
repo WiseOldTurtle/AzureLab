@@ -97,7 +97,7 @@
             "name": "subnetLoop",
             "count": "[length(parameters('subnets'))]",
             "input": {
-              "name": "[if(equals(parameters('subnets')[copyIndex('subnetLoop')].name,'AzureBastionSubnet'),parameters('subnets')[copyIndex('subnetLoop')].name ,concat('wot-',parameters('subnets')[copyIndex('subnets')].name,'-sub'))]",
+              "name": "[if(equals(parameters('subnets')[copyIndex('subnetLoop')].name,'AzureBastionSubnet'),parameters('subnets')[copyIndex('subnetLoop')].name ,concat('wot-',parameters('subnets')[copyIndex('subnetLoop')].name,'-sub'))]",
               // "name": "[parameters('subnets')[copyIndex('subnets')].name]",
               "properties": {
                 "addressPrefix": "[parameters('subnets')[copyIndex('subnetLoop')].addressPrefix]"

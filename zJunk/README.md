@@ -1,2 +1,0 @@
-# AzureLab
-testing and learning

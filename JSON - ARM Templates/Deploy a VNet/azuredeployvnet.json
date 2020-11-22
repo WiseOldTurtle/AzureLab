@@ -4,14 +4,12 @@
   "parameters": {
     "vnetName": {
       "type": "string",
-      "defaultValue": "VNet1",
       "metadata": {
         "description": "VNet name"
       }
     },
     "vnetAddressPrefix": {
       "type": "string",
-      "defaultValue": "10.0.0.0/16",
       "metadata": {
         "description": "Address prefix"
       }
@@ -22,71 +20,37 @@
         "description": "description"
       }
     },
-    "azureBastion": {
-      "type": "string",
-      "metadata": {
-        "description": "Please type 'yes' for Azure Bastion deployment"
-      }
-    },
-    "azureBastionName": {
-      "type": "string",
-      "metadata": {
-        "description": "Azure Bastion Name"
-      }
-    },
-    "networkSecurityGroup": {
-      "type": "string",
-      "metadata": {
-        "description": "Please type 'yes' for NSG deployment"
-      }
-    },
     "location": {
       "type": "string",
       "metadata": {
         "description": "Location for all resources."
       }
+    },
+    "region": {
+      "type": "string",
+      "metadata": {
+        "description": "fixed characters for the naming conventions"
+      }
     }
   },
+
   "variables": {
-    //   "NSG1": {
-    //     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG1Name'))]"
-    //   },
-    //   "NSG2": {
-    //     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG2Name'))]"
-    //   },
-    //  "NSG3": {
-    //  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG3Name'))]"
-    //   },
-    //   "NSGBastion": {
-    //     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNSGName'))]"
-    //   },
-    // "NSG1Name": "[concat('NSG-',parameters('subnet1Name'))]",
-    // "NSG2Name": "[concat('NSG-',parameters('subnet2Name'))]",
-    // "NSG3Name": "[concat('NSG-',parameters('subnet3Name'))]",
-    "bastionIPName": "[concat('PIP-','AzureBastionSubnet')]",
-    "bastionNSGName": "[concat('NSG-','AzureBastionSubnet')]",
-    // "nsgvar": "[parameters('subnets')[copyIndex('subnets')].nsgname]",
-    "APIComputevirtualMachines": "[providers('Microsoft.Compute','virtualMachines').apiVersions[0]]",
-    "APIComputevirtualMachinesExt": "[providers('Microsoft.Compute','virtualMachines/extensions').apiVersions[0]]",
-    "APIComputeavailabilitySets": "[providers('Microsoft.Compute','availabilitySets').apiVersions[0]]",
-    "APIResourcesDeployments": "[providers('Microsoft.Resources','deployments').apiVersions[0]]",
-    "APINetworkpublicIPAddresses": "[providers('Microsoft.Network','publicIPAddresses').apiVersions[0]]",
-    "APINetworkvirtualNetworks": "[providers('Microsoft.Network','virtualNetworks').apiVersions[0]]",
-    "APINetworkvirtualNetworkSecurityGroups": "[providers('Microsoft.Network','networkSecurityGroups').apiVersions[0]]",
-    "APINetworkvirtualNetworkGateways": "[providers('Microsoft.Network','virtualNetworkGateways').apiVersions[0]]",
-    "APINetworklocalNetworkGateways": "[providers('Microsoft.Network','localNetworkGateways').apiVersions[0]]",
-    "APINetworkrouteTables": "[providers('Microsoft.Network','routeTables').apiVersions[0]]",
-    "APINetworkFirewall": "[providers('Microsoft.Network','azureFirewalls').apiVersions[0]]",
-    "APINetworkconnections": "[providers('Microsoft.Network','connections').apiVersions[0]]",
-    //"APINetworkvirtualNetworkPeerings": "[providers('Microsoft.Network','virtualNetworks/virtualNetworkPeerings').apiVersions[0]]",
-    "APINetworkloadBalancers": "[providers('Microsoft.Network','loadBalancers').apiVersions[0]]",
-    "APIStoragestorageAccounts": "[providers('Microsoft.Storage','storageAccounts').apiVersions[0]]"
+    "namingConvention": {
+      "snPrefix": "sn-",
+      "forceID": "wot-",
+      "vnPrefix": "vn-",
+      "nsgPrefix": "nsg-"
+    },
+    "subnetName": "[concat(variables('namingConvention').snPrefix, variables('namingConvention').forceID, parameters('region'))]",
+    "vnetName": "[concat(variables('namingConvention').vnPrefix, variables('namingConvention').forceID, parameters('region'), parameters('vnetName'))]",
+    "apiVersion": "2018-05-01"
   },
+
   "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "[variables('APINetworkvirtualNetworks')]",
-      "name": "[concat(parameters('vnetName') , '-testnet')]",
+      "apiVersion": "[variables('apiVersion')]",
+      "name": "[variables('vnetName')]",
       "location": "[parameters('location')]",
       "properties": {
         "addressSpace": {
@@ -94,70 +58,16 @@
         },
         "copy": [
           {
-            "name": "subnetLoop",
+            "name": "subnets",
             "count": "[length(parameters('subnets'))]",
             "input": {
-              "name": "[if(equals(parameters('subnets')[copyIndex('subnetLoop')].name,'AzureBastionSubnet'),parameters('subnets')[copyIndex('subnetLoop')].name ,concat('wot-',parameters('subnets')[copyIndex('subnetLoop')].name,'-sub'))]",
-              // "name": "[parameters('subnets')[copyIndex('subnets')].name]",
+              "name": "[if(equals(parameters('subnets')[copyIndex('subnets')].name,'AzureBastionSubnet'),parameters('subnets')[copyIndex('subnets')].name,concat(variables('subnetName'),parameters('subnets')[copyIndex('subnets')].name))]",
               "properties": {
-                "addressPrefix": "[parameters('subnets')[copyIndex('subnetLoop')].addressPrefix]"
-              }
-            }
-          },
-          {
-            "dependsOn": "subnetLoop",
-            "name": "nsgLoop",
-            "count": "[length(parameters('subnets'))]",
-            "input": {
-              "name": "[if(equals(parameters('subnets')[copyIndex('nsgLoop')].name,'Bastion'),parameters('subnets')[copyIndex('nsgLoop')].nsgname ,concat('wot-',parameters('subnets')[copyIndex('nsgLoop')].nsgname,'-nsg'))]",
-              // "name": "[parameters('subnets')[copyIndex('subnets')].name]",
-              "properties": {
-                "addressPrefix": "[parameters('subnets')[copyIndex('nsgLoop')].addressPrefix]"
+                "addressPrefix": "[parameters('subnets')[copyIndex('subnets')].addressPrefix]"
               }
             }
           }
         ]
-        //  "networkSecurityGroup": "[if(equals(parameters('networkSecurityGroup'),'yes'),variables('NSG3'),json('null'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Network/bastionHosts",
-      "apiVersion": "2019-04-01",
-      "name": "[parameters('azureBastionName')]",
-      "condition": "[equals(parameters('azureBastion'), 'yes')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIpAddresses', variables('bastionIPname'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "AzureBastion",
-            "properties": {
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), 'AzureBastionSubnet')]"
-              },
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('bastionIPName'))]"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2019-04-01",
-      "name": "[variables('bastionIpName')]",
-      "condition": "[equals(parameters('azureBastion'), 'yes')]",
-      "location": "[parameters('location')]",
-      "sku": {
-        "name": "Standard"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "Static",
-        "publicIPAddressVersion": "IPv4"
       }
     }
   ]

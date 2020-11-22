@@ -1,0 +1,150 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "imageOffer": {
+      "type": "string"
+    },
+    "imagePublisher": {
+      "type": "string"
+    },
+    "imageSKU": {
+      "type": "string"
+    },
+    "localAdminPassword": {
+      "type": "securestring",
+      "minLength": 12,
+      "maxLength": 123,
+      "metadata": {
+        "description": "Specifies the password for the local administrator account. Password must be between 12-123 characters and have no less than 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character that is not '\\' or '-'."
+      }
+    },
+    "localAdminUsername": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Specifies the username for the local administrator account."
+      }
+    },
+    "subnetName": {
+      "type": "string"
+    },
+    "virtualMachineDiskType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Premium_LRS"
+      ],
+      "metadata": {
+        "description": "Specifies the type of managed disk used by the virtual machine(s)."
+      }
+    },
+    "virtualMachineName": {
+      "type": "string",
+      "maxLength": 16,
+      "metadata": {
+        "description": "Specifies the static portion of the name for each VM.  Maximum length is 13, to allow for a numeric suffix for Virtual Machine Names."
+      }
+    },
+    "virtualMachineSize": {
+      "type": "string",
+      "defaultValue": "Standard_DS2_v2",
+      "metadata": {
+        "description": "Specifies the size of the virtual machine(s)."
+      }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name of the vNet which the VM(s) will be attached to."
+      }
+    },
+    "virtualNetworkResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the Resource Group of the vNet which the VM(s) will be attached to."
+      }
+    }
+  },
+  "variables": {
+    "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-nic')]",
+    "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+    "vnetId": "[resourceId(parameters('virtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+    "APIComputevirtualMachines": "[providers('Microsoft.Compute','virtualMachines').apiVersions[0]]",
+    "APIComputevirtualMachinesExt": "[providers('Microsoft.Compute','virtualMachines/extensions').apiVersions[0]]",
+    "APIComputeavailabilitySets": "[providers('Microsoft.Compute','availabilitySets').apiVersions[0]]",
+    "APIResourcesDeployments": "[providers('Microsoft.Resources','deployments').apiVersions[0]]",
+    "APINetworkpublicIPAddresses": "[providers('Microsoft.Network','publicIPAddresses').apiVersions[0]]",
+    "APINetworkloadBalancers": "[providers('Microsoft.Network','loadBalancers').apiVersions[0]]",
+    "APIStoragestorageAccounts": "[providers('Microsoft.Storage','storageAccounts').apiVersions[0]]"
+  },
+  "resources": [
+    {
+      "name": "[variables('networkInterfaceName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2018-04-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('virtualMachineName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2018-06-01",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('virtualMachineSize')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(parameters('virtualMachineName'),'-osDisk')]",
+            "createOption": "FromImage",
+            "managedDisk": {
+              "storageAccountType": "[parameters('virtualMachineDiskType')]"
+            }
+          },
+          "dataDisks": [
+
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceName')))]"
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('virtualMachineName'))]",
+          "adminUsername": "[parameters('localAdminUsername')]",
+          "adminPassword": "[parameters('localAdminPassword')]",
+          "secrets": []
+        }
+      }
+    }
+  ]
+}

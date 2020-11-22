@@ -1,0 +1,17 @@
+# an implicit stage means that if a stage is not defined within your YAML pipeline then it defaults to create all jobs within a stage.
+
+trigger:
+- none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+# As you can see there are 2 jobs defined below, this is how you create a job with steps within YAML
+jobs:
+- job: A
+  steps:
+  - script: echo "A"
+
+- job: B
+  steps:
+  - script: echo "B"

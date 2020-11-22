@@ -44,7 +44,8 @@
     "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-vnic')]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
     "vnetId": "[resourceId(parameters('virtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-    
+  
+  // This is a Variable object defining a VM used within a test environment, we later reference this using the variable(variableName).object 
     "vmstandard" : {
         "imageOffer" :  "WindowsServer",
         "imageSku" : "2012-R2-Datacenter-smalldisk",
@@ -56,6 +57,7 @@
         "AdminUsername" : "wiseoldturtle"
     },
 
+// these are lists of all the API's you xcan simply replace one of the variables in "apiVersion" and it will provide you with the latest API when deploying that resource.
     "APIComputevirtualMachines": "[providers('Microsoft.Compute','virtualMachines').apiVersions[0]]",
     "APIComputevirtualMachinesExt": "[providers('Microsoft.Compute','virtualMachines/extensions').apiVersions[0]]",
     "APIComputeavailabilitySets": "[providers('Microsoft.Compute','availabilitySets').apiVersions[0]]",
@@ -74,6 +76,14 @@
                  },
   "resources": [
     {
+      // When you are doing a copy loop you have to concat the name and specify the copy index. You can see on line 91 that a copy loop is defined. 
+      // a Concat is when you combine strings of text together, in this example the name of the Vnic will be a combination of the Variable and the instance of the copy loop. 
+     
+      // the copy index is broken down as such: 
+      // "copyIndex(CopyloopName)" in my example i had put a number instead of a name. If you have different copy loops that are not related to one another than you can specify the names ensure seperation.
+      // If you place a number within the () following the copyIndex then it will create a resource starting from 1 for example VM1, VM2 and so on. 
+      // there are 2 more values following the copyIndex() the first value I had set to 2 which means that the maximum number of integers can be 2
+      // the '0' value specifies the padding to use. So when it copies the VNic and VM it will make it as Vnic01 and Vnic02 
       "name": "[concat(variables('networkInterfaceName'), padLeft(copyIndex(1), 2, '0'))]",
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2018-04-01",

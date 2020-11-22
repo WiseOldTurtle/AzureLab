@@ -1,45 +1,42 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "vnetName": {
-        "value": "VNET-01"
-      },
-      "location": {
-          "value": "UK South" // TODO: Fill in parameter value
-      },
-      "subnets": {
-        "value": [
-            {
-            "name": "AzureBastionSubnet",
-            "addressPrefix": "10.0.0.0/24",
-            "nsgName" : "Bastion"
-            },
-            {
-            "name": "Production",
-            "addressPrefix": "10.0.1.0/24",
-            "nsgName" : "Prod"
-          },
-          {
-            "name": "Backend",
-            "addressPrefix": "10.0.2.0/24",
-            "nsgName" : "Back"
-          },
-          {
-            "name": "Frontend",
-            "addressPrefix": "10.0.3.0/24",
-            "nsgName" : "Front"
-          }
-        ]
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetName": {
+      "value": "hub01"
     },
-      "networkSecurityGroup" : {
-        "value": "yes"
-      },
-      "azureBastion": {
-        "value": "yes"
-      },
-      "azureBastionName": {
-        "value": "AzureBastion"
-      }
+    "vnetAddressPrefix": {
+      "value": "10.60.0.0/23"
+    },
+    "location": {
+      "value": "uksouth" // TODO: Fill in parameter value
+    },
+    "subnets": {
+      "value": [
+        {
+          "name": "AzureBastionSubnet",
+          "addressPrefix": "10.60.0.0/27"
+        },
+        {
+          "name": "firewall01",
+          "addressPrefix": "10.60.0.32/28"
+        },
+        {
+          "name": "firewall02",
+          "addressPrefix": "10.60.0.48/28"
+        },
+        {
+          "name": "management01",
+          "addressPrefix": "10.60.0.64/26"
+        },
+        {
+          "name": "cloudguardmgmt",
+          "addressPrefix": "10.60.0.128/27"
+        }
+      ]
+    },
+    "region": {
+      "value": "uks-"
     }
   }
+}

@@ -1,0 +1,85 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "aksClusterName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the AKS cluster"
+      }
+    },
+    "agentCount": {
+      "type": "int",
+      "defaultValue": 3,
+      "metadata": {
+        "description": "Number of nodes in the AKS cluster"
+      }
+    },
+    "agentVMSize": {
+      "type": "string",
+      "defaultValue": "Standard_DS2_v2",
+      "metadata": {
+        "description": "Size of the VM for the AKS cluster nodes"
+      }
+    },
+    "dnsPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "DNS prefix for the AKS cluster"
+      }
+    },
+    "servicePrincipalClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "Service principal client ID for the AKS cluster"
+      }
+    },
+    "servicePrincipalClientSecret": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Service principal client secret for the AKS cluster"
+      }
+    }
+  },
+  "variables": {
+    "aksClusterId": "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ContainerService/managedClusters",
+      "apiVersion": "2021-03-01",
+      "name": "[parameters('aksClusterName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "kubernetesVersion": "1.20.7",
+        "dnsPrefix": "[parameters('dnsPrefix')]",
+        "agentPoolProfiles": [
+          {
+            "name": "agentpool",
+            "count": "[parameters('agentCount')]",
+            "vmSize": "[parameters('agentVMSize')]",
+            "osType": "Linux",
+            "mode": "System"
+          }
+        ],
+        "servicePrincipalProfile": {
+          "clientId": "[parameters('servicePrincipalClientId')]",
+          "secret": "[parameters('servicePrincipalClientSecret')]"
+        },
+        "networkProfile": {
+          "networkPlugin": "azure",
+          "loadBalancerSku": "standard",
+          "serviceCidr": "10.0.0.0/16",
+          "dnsServiceIP": "10.0.0.10",
+          "dockerBridgeCidr": "172.17.0.1/16"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "aksClusterId": {
+      "type": "string",
+      "value": "[variables('aksClusterId')]"
+    }
+  }
+}

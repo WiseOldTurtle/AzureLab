@@ -4,7 +4,7 @@
   "parameters": {
     "rgLocation": {
       "type": "string",
-      "defaultValue": "uksouth"
+      "defaultValue": "ukwest"
     },
     "rgName": {
       "type": "string",

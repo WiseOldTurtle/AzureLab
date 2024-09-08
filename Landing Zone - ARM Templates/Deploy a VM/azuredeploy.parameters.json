@@ -20,7 +20,7 @@
         "AdminPassword": {
             "reference": {
                 "keyVault": {
-                "id": "/subscriptions/dee63b58-8ba6-46f7-81bc-3613f27c8b88/resourceGroups/rg-kv-wotlab01/providers/Microsoft.KeyVault/vaults/KV-UKS-WOTLAB01"
+                "id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-kv-wotlab01/providers/Microsoft.KeyVault/vaults/kv-uks-wotlab01"
                 },
                 "secretName": "AdminAccountPassword"
             }

@@ -5,7 +5,7 @@
  
  "variables": {
   
-  "KeyVaultName": "KV-UKS-WOTLAB01",
+  "KeyVaultName": "kv-uks-wotlab01",
   "secretName" : "AdminAccountPassword",
   "secretValue": "@gBeMnO0Qnca" ,
   "location" : " Uk South"

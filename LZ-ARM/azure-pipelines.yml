@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - main
+      - master
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -11,7 +11,6 @@ variables:
   resourceGroupName: 'rg-vnet-wotlab01'
   vnetTemplateFile: 'LZ-ARM/DeployNetworking/azuredeploy.json'
   vnetParametersFile: 'LZ-ARM/DeployNetworking/azuredeploy.parameters.json'
-  vnetName: $(vnetName)
 
 
 steps:

@@ -11,6 +11,8 @@ variables:
   resourceGroupName: 'rg-vnet-wotlab01'
   vnetTemplateFile: 'LZ-ARM/DeployNetworking/azuredeploy.json'
   vnetParametersFile: 'LZ-ARM/DeployNetworking/azuredeploy.parameters.json'
+  vnetName: $(vnetName)
+
 
 steps:
 - task: AzureCLI@2
@@ -22,6 +24,7 @@ steps:
       az group create --name $(resourceGroupName) --location $(location)
 
 - task: AzureResourceManagerTemplateDeployment@3
+  displayName: 'Deploy Hub VNET and Subnets'
   inputs:
     azureResourceManagerConnection: 'azureSP'
     action: 'Create Or Update Resource Group'

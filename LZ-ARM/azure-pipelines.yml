@@ -9,8 +9,8 @@ pool:
 variables:
   location: 'uksouth'
   resourceGroupName: 'rg-vnet-wotlab01'
-  vnetTemplateFile: 'LZ-ARM/DeployNetworking/azuredeploy.json'
-  vnetParametersFile: 'LZ-ARM/DeployNetworking/azuredeploy.parameters.json'
+  armTemplateFile: 'LZ-ARM/DeployNetworking/azuredeploy.json'
+  armParametersFile: 'LZ-ARM/DeployNetworking/azuredeploy.parameters.json'
 
 
 steps:
@@ -33,4 +33,21 @@ steps:
     templateLocation: 'Linked artifact'
     csmFile: '$(System.DefaultWorkingDirectory)/$(armTemplateFile)'
     csmParametersFile: '$(System.DefaultWorkingDirectory)/$(armParametersFile)'
+    deploymentMode: 'Incremental'
+
+- task: AzureResourceManagerTemplateDeployment@3
+  displayName: 'Deploy Core VNET and Subnets'
+  inputs:
+    azureResourceManagerConnection: 'azureSP'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: $(resourceGroupName)
+    subscriptionId: 'd9d2ecd3-56a0-4f15-bae9-04b37c0d4335'
+    location: $(location)
+    templateLocation: 'Linked artifact'
+    csmFile: '$(System.DefaultWorkingDirectory)/$(armTemplateFile)'
+    csmParametersFile: '$(System.DefaultWorkingDirectory)/$(armParametersFile)'
+    overrideParameters: 
+      -vnetName "core01" 
+      -vnetAddressPrefix "10.60.16.0/24" 
+      -subnets [{"name":"application01","addressPrefix":"10.60.16.0/26"},{"name":"database01","addressPrefix":"10.60.16.64/26"},{"name":"activedirectory","addressPrefix":"10.60.16.128/26"},{"name":"webserver01","addressPrefix":"10.60.16.192/28"}]
     deploymentMode: 'Incremental'

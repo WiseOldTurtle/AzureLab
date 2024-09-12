@@ -3,7 +3,7 @@ name: Sync to Azure DevOps
 on:
   push:
     branches:
-      - main # or any other branch you want to sync
+      - master
 
 jobs:
   sync:

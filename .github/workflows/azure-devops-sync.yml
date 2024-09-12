@@ -1,0 +1,31 @@
+name: Sync to Azure DevOps
+
+on:
+  push:
+    branches:
+      - main # or any other branch you want to sync
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout GitHub Repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # Fetch all history for all branches
+
+    - name: Set up Git
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "actions@github.com"
+
+    - name: Add Azure DevOps Remote
+      run: |
+        git remote add azure https://$(AZURE_DEVOPS_PAT)@dev.azure.com/WiseOldTurtle/DevOpsLab/_git/AzureLandingZone
+
+    - name: Push changes to Azure DevOps
+      run: |
+        git push azure --all
+      env:
+        AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}

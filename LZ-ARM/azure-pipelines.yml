@@ -9,8 +9,8 @@ pool:
 variables:
   location: 'uksouth'
   resourceGroupName: 'rg-vnet-wotlab01'
-  vnetTemplateFile: 'LZ-ARM/DeployNetworking/azuredeploy.json'
-  vnetParametersFile: 'LZ-ARM/DeployNetworking/azuredeploy.parameters.json'
+  armTemplateFile: 'LZ-ARM/DeployNetworking/azuredeploy.json'
+  armParametersFile: 'LZ-ARM/DeployNetworking/azuredeploy.parameters.json'
 
 
 steps:

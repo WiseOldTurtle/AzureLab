@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "existingLocalVirtualNetworkName": {
-        "value": "hub-vnet-wotlab01"
+        "value": "vn-wot-uks-core01"
       },
       "existingRemoteVirtualNetworkName": {
-        "value": "core-vnet-wotlab01"
+        "value": "vn-wot-uks-hub01"
       },
       "existingRemoteVirtualNetworkResourceGroupName": {
         "value": "rg-vnet-wotlab01"

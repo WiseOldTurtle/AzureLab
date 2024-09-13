@@ -32,7 +32,7 @@ steps:
     templateLocation: 'Linked artifact'
     csmFile: '$(System.DefaultWorkingDirectory)/$(armTemplateFile)'
     csmParametersFile: '$(System.DefaultWorkingDirectory)/$(armParametersFile)'
-    deploymentMode: 'Incremental'
+    deploymentMode: 'validation'
 
 - task: AzureResourceManagerTemplateDeployment@3
   displayName: 'Deploy Core VNET and Subnets'
@@ -49,7 +49,7 @@ steps:
       -vnetName "core01" 
       -vnetAddressPrefix "10.60.16.0/24" 
       -subnets [{"name":"application01","addressPrefix":"10.60.16.0/26"},{"name":"database01","addressPrefix":"10.60.16.64/26"},{"name":"activedirectory","addressPrefix":"10.60.16.128/26"},{"name":"webserver01","addressPrefix":"10.60.16.192/28"}]
-    deploymentMode: 'Incremental'
+    deploymentMode: 'validation'
 
 - task: AzureResourceManagerTemplateDeployment@3
   displayName: 'Deploy Prod VNET and Subnets'
@@ -66,7 +66,7 @@ steps:
       -vnetName "prod01"
       -vnetAddressPrefix "10.60.32.0/24"
       -subnets [{"name":"application01","addressPrefix":"10.60.32.0/26"},{"name":"database01","addressPrefix":"10.60.32.64/26"},{"name":"webserver01","addressPrefix":"10.60.32.128/26"}]
-    deploymentMode: 'Incremental'
+    deploymentMode: 'validation'
 
 - task: AzureResourceManagerTemplateDeployment@3
   displayName: 'Deploy Pre-Prod VNET and Subnets'
@@ -83,7 +83,7 @@ steps:
       -vnetName "preprod01"
       -vnetAddressPrefix "10.60.64.0/24"
       -subnets [{"name":"application01","addressPrefix":"10.60.64.0/26"},{"name":"database01","addressPrefix":"10.60.64.64/26"},{"name":"webserver01","addressPrefix":"10.60.64.128/26"}]
-    deploymentMode: 'Incremental'
+    deploymentMode: 'validation'
 
 - task: AzureResourceManagerTemplateDeployment@3
   displayName: 'Deploy Test Subnets'
@@ -100,7 +100,7 @@ steps:
       -vnetName "preprod01"
       -vnetAddressPrefix "10.60.96.0/25"
       -subnets [{"name":"application01","addressPrefix":"10.60.96.0/27"},{"name":"database01","addressPrefix":"10.60.96.32/27"},{"name":"webserver01","addressPrefix":"10.60.96.64/27"}]
-    deploymentMode: 'Incremental'
+    deploymentMode: 'validation'
 
 - task: AzureResourceManagerTemplateDeployment@3
   displayName: 'Deploy Dev Subnets'
@@ -117,7 +117,7 @@ steps:
       -vnetName "preprod01"
       -vnetAddressPrefix "10.60.112.0/25"
       -subnets [{"name":"application01","addressPrefix":"10.60.112.0/27"},{"name":"database01","addressPrefix":"10.60.112.32/27"},{"name":"webserver01","addressPrefix":"10.60.112.64/27"}]
-    deploymentMode: 'Incremental'
+    deploymentMode: 'validation'
 
 - task: AzureResourceManagerTemplateDeployment@3
   displayName: 'Deploy UDRs'
@@ -130,7 +130,7 @@ steps:
     templateLocation: 'Linked artifact'
     csmFile: '$(System.DefaultWorkingDirectory)/LZ-ARM/DeployNetworking/UDR/azuredeploy.json'
     csmParametersFile: '$(System.DefaultWorkingDirectory)/LZ-ARM/DeployNetworking/UDR/azuredeploy.parameters.json'
-    deploymentMode: 'Incremental'
+    deploymentMode: 'validation'
 
 - task: AzureResourceManagerTemplateDeployment@3
   displayName: 'Deploy NSGs'
@@ -142,7 +142,7 @@ steps:
     location: $(location)
     templateLocation: 'Linked artifact'
     csmFile: '$(System.DefaultWorkingDirectory)/LZ-ARM/DeployNetworking/NSG/azuredeploy.json'
-    deploymentMode: 'Incremental'
+    deploymentMode: 'validation'
 
 - task: AzureResourceManagerTemplateDeployment@3
   displayName: 'Configure VNET Peering'
@@ -157,3 +157,4 @@ steps:
       -existingLocalVirtualNetworkName "vn-wot-uks-core01"
       -existingRemoteVirtualNetworkName "vn-wot-uks-hub01"
       -existingRemoteVirtualNetworkResourceGroupName "rg-vnet-wotlab01"
+    deploymentMode: 'incremental'

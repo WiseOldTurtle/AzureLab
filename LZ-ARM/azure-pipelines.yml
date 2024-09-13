@@ -153,8 +153,4 @@ steps:
     location: $(location)
     csmFile: '$(System.DefaultWorkingDirectory)/LZ-ARM/DeployNetworking/Peering/azuredeploy.json'
     csmParametersFile: '$(System.DefaultWorkingDirectory)/LZ-ARM/DeployNetworking/Peering/azuredeploy.parameters.json'
-    overrideParameters: 
-      -existingLocalVirtualNetworkName "vn-wot-uks-core01"
-      -existingRemoteVirtualNetworkName "vn-wot-uks-hub01"
-      -existingRemoteVirtualNetworkResourceGroupName "rg-vnet-wotlab01"
     deploymentMode: 'incremental'

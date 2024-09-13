@@ -9,7 +9,7 @@
         "value": "core-vnet-wotlab01"
       },
       "existingRemoteVirtualNetworkResourceGroupName": {
-        "value": "rg-vnet2-wotlab01"
+        "value": "rg-vnet-wotlab01"
       }
     }
   }

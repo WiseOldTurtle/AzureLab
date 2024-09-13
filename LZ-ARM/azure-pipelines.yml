@@ -69,23 +69,6 @@ steps:
     deploymentMode: 'Incremental'
 
 - task: AzureResourceManagerTemplateDeployment@3
-  displayName: 'Deploy Prod VNET and Subnets'
-  inputs:
-    azureResourceManagerConnection: azureSP
-    action: 'Create Or Update Resource Group'
-    resourceGroupName: $(resourceGroupName)
-    subscriptionId: 'd9d2ecd3-56a0-4f15-bae9-04b37c0d4335'
-    location: $(location)
-    templateLocation: 'Linked artifact'
-    csmFile: '$(System.DefaultWorkingDirectory)/$(armTemplateFile)'
-    csmParametersFile: '$(System.DefaultWorkingDirectory)/$(armParametersFile)'
-    overrideParameters: 
-      -vnetName "prod01"
-      -vnetAddressPrefix "10.60.32.0/24"
-      -subnets [{"name":"application01","addressPrefix":"10.60.32.0/26"},{"name":"database01","addressPrefix":"10.60.32.64/26"},{"name":"webserver01","addressPrefix":"10.60.32.128/26"}]
-    deploymentMode: 'Incremental'
-
-- task: AzureResourceManagerTemplateDeployment@3
   displayName: 'Deploy Pre-Prod VNET and Subnets'
   inputs:
     azureResourceManagerConnection: azureSP

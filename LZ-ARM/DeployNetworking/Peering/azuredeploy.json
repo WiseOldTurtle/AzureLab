@@ -28,8 +28,9 @@
       }
     }
   },
-  "variables": {},
-   // "vnetResourceID": "[concat(subscription().id,'/resourceGroups/',parameters('existingRemoteVirtualNetworkResourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/', parameters('existingRemoteVirtualNetworkName'))]"   },
+  "variables": {
+   "vnetResourceID": "[concat(subscription().id,'/providers/Microsoft.Network/virtualNetworks/', parameters('existingRemoteVirtualNetworkName'))]"
+   },
   "resources": [
     {
       "apiVersion": "2019-11-01",
@@ -42,7 +43,7 @@
         "allowGatewayTransit": false,
         "useRemoteGateways": false,
         "remoteVirtualNetwork": {
-          "id": "[resourceId(subscription().id,'/resourceGroups/',parameters('existingRemoteVirtualNetworkResourceGroupName'), 'Microsoft.Network/virtualNetworks', parameters('existingRemoteVirtualNetworkName'))]"
+          "id": "[variables('vnetResourceID')]"
         }
       }
     }

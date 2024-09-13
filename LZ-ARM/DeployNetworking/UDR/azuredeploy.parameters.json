@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "routeTableName": {
-      "value": "UDRName" // TODO: Fill in parameter value
+      "value": "wotlab-udr"
     },
     "udrRoutes": {
       "value": [

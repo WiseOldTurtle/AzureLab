@@ -29,7 +29,7 @@
     }
   },
   "variables": {
-    "vnetResourceID": "[concat('/subscriptions/', subscription().id,'/resourceGroups/',parameters('existingRemoteVirtualNetworkResourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/', parameters('existingRemoteVirtualNetworkName'))]"
+    "vnetResourceID": "[concat(subscription().id,'/resourceGroups/',parameters('existingRemoteVirtualNetworkResourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/', parameters('existingRemoteVirtualNetworkName'))]"
    },
   "resources": [
     {

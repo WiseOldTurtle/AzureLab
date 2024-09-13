@@ -145,7 +145,6 @@ steps:
     csmParametersFile: '$(System.DefaultWorkingDirectory)/LZ-ARM/DeployNetworking/NSG/azuredeploy.parameters.json'
     deploymentMode: 'Incremental'
 
-steps:
 - task: AzureResourceManagerTemplateDeployment@3
   displayName: 'Configure VNET Peering'
   inputs:

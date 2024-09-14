@@ -31,7 +31,7 @@ stages:
         command: 'init'
         backendServiceArm: Azure
         backendAzureRmResourceGroupName: 'tfstate'
-        backendAzureRmStorageAccountName: 'tfbackend7890'
+        backendAzureRmStorageAccountName: 'tfbackendstore'
         backendAzureRmContainerName: 'tfbackend'
         backendAzureRmKey: 'prod.terraform.tfstate'
 

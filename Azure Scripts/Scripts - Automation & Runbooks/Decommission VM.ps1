@@ -5,9 +5,9 @@ function Remove-AzrVirtualMachine {
 		due to the time it takes to remove an Azure VM.
 		
 	.EXAMPLE
-		PS> Get-AzVm -Name 'BAPP07GEN22' | Remove-AzrVirtualMachine
+		PS> Get-AzVm -Name 'YOURVMNAME' | Remove-AzrVirtualMachine
 	
-		This example removes the Azure VM BAPP07GEN22 as well as any disks attached to it.
+		This example removes the Azure VM YOURVMNAME as well as any disks attached to it.
 		
 	.PARAMETER VMName
 		The name of an Azure VM. This has an alias of Name which can be used as pipeline input from the Get-AzureRmVM cmdlet.

@@ -5,7 +5,7 @@
 # 1) Update the .\NewNSGRule.csv file with the names of the NSG's to update
 # 2) Sign into the destination tenant and set context to the subscription you'll be working in
 # Examples
-# Connect-AzAccount -Tenant newsignature1.onmicrosoft.com
+# Connect-AzAccount -Tenant TENANTNAME
 # Set-AzContext -SubscriptionId $SubscriptionID
 # 3) Run the Script
 # .\NewNSGRule.ps1
@@ -15,7 +15,7 @@ $TenantId = "";
 $SubscriptionId = "";
 
 # CSV File containing the resource group and network security group names
-$CSVFile = ".\SvitzerIdentityAndSecurity01ArmMn.csv"
+$CSVFile = ".\FILEPATH.csv"
 
 # you can comment out the Connect-AzAccount line if you are running
 # in the same environment multiple times
@@ -23,9 +23,9 @@ Connect-AzAccount -Tenant $TenantId
 Set-AzContext -SubscriptionId $SubscriptionId
 
 # Variables for New NSG Rule Criteria
-$RuleName = "Thy-RDP-In" # Name
-$Desc = "Permits RDP Access to Thycotic VM" #Description
-$SrcIP = "10.4.194.228", "10.4.142.4" # Source Information
+$RuleName = "NAME" # Name
+$Desc = "SHORT DESCRIPTION" #Description
+$SrcIP = "192.168.0.1", "127.0.0.1" # Source Information
 $DestIP = "*" # Destination Information
 $Proto = "TCP" # IP Protocol
 $DestPort = "3389" # Destination Port

@@ -30,3 +30,11 @@ variable "administrator_login_password" {
 variable "shared_key" {
 
 }
+
+variable "module_instances" {
+  type = list(object({
+    name        = string
+    vnet_name   = string
+    subnet_name = string
+  }))
+}

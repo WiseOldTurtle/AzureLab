@@ -22,6 +22,19 @@ Tools:
 
 ## **Terraform Configuration:**
 
+/terraform
+   ├── /networking
+   │     ├── main.tf          # VNETs and subnets (private)
+   │     ├── variables.tf     # Variables for networking
+   │     ├── outputs.tf       # Outputs from the networking module
+   ├── /security
+   │     ├── main.tf          # NSG rules for traffic control
+   │     ├── variables.tf     # Variables for NSGs
+   │     ├── outputs.tf       # Outputs from the security module
+   ├── /policy
+   │     ├── main.tf          # Azure policy for restricting public IPs and VM sizes
+   ├── backend.tf             # Terraform state storage in Azure Blob Storage
+   └── azure-pipelines.yml    # Azure DevOps pipeline for Terraform deployment
 
 
 

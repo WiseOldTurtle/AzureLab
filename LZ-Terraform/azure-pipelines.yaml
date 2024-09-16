@@ -19,8 +19,8 @@ stages:
           - script: |
               cd LZ-Terraform/networking
               terraform init
-              terraform plan
-              terraform apply -auto-approve
+              terraform plan -input=false
+              terraform apply -input=false -auto-approve
             displayName: 'Run Terraform for Networking'
             env:
               ARM_CLIENT_ID: $(ARM_CLIENT_ID)
@@ -31,8 +31,8 @@ stages:
           - script: |
               cd LZ-Terraform/security
               terraform init
-              terraform plan
-              terraform apply -auto-approve
+              terraform plan -input=false
+              terraform apply -input=false -auto-approve
             displayName: 'Run Terraform for Security'
             env:
               ARM_CLIENT_ID: $(ARM_CLIENT_ID)
@@ -43,8 +43,8 @@ stages:
           - script: |
               cd LZ-Terraform/policy
               terraform init
-              terraform plan
-              terraform apply -auto-approve
+              terraform plan -input=false
+              terraform apply -input=false -auto-approve
             displayName: 'Run Terraform for Policy'
             env:
               ARM_CLIENT_ID: $(ARM_CLIENT_ID)

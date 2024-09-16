@@ -17,21 +17,21 @@ stages:
         displayName: 'Run Terraform Commands'
         steps:
           - script: |
-              cd networking
+              cd LZ-Terraform/networking
               terraform init
               terraform plan
               terraform apply -auto-approve
             displayName: 'Run Terraform for Networking'
 
           - script: |
-              cd security
+              cd LZ-Terraform/security
               terraform init
               terraform plan
               terraform apply -auto-approve
             displayName: 'Run Terraform for Security'
 
           - script: |
-              cd policy
+              cd LZ-Terraform/policy
               terraform init
               terraform plan
               terraform apply -auto-approve

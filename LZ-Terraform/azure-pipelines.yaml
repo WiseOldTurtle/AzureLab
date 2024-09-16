@@ -7,47 +7,37 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  - group: WiseOldTurtleSP  # Variable group where secrets are stored
-  - template: variables.yaml # Reusable YAML templates which define common configurations / reduce duplication.
+  - group: WiseOldTurtleSP  # Your variable group containing secrets
 
 stages:
   - stage: DeployLZ
     jobs:
-      - job: DeployCoreResources
-        displayName: 'Run Terraform Commands'
+      - job: 'Deploy Core Resources'
+        displayName: 'Run Terrafom init,plan and deploy'
         steps:
           - script: |
+              echo "Generating terraform.tfvars for Networking"
+              envsubst < LZ-Terraform/networking/terraform.tfvars.template > LZ-Terraform/networking/terraform.tfvars
               cd LZ-Terraform/networking
               terraform init
-              terraform plan -input=false
-              terraform apply -input=false -auto-approve
+              terraform plan -var-file=terraform.tfvars -input=false
+              terraform apply -var-file=terraform.tfvars -input=false -auto-approve
             displayName: 'Run Terraform for Networking'
-            env:
-              ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-              ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-              ARM_TENANT_ID: $(ARM_TENANT_ID)
-              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
 
           - script: |
+              echo "Generating terraform.tfvars for Security"
+              envsubst < LZ-Terraform/security/terraform.tfvars.template > LZ-Terraform/security/terraform.tfvars
               cd LZ-Terraform/security
               terraform init
-              terraform plan -input=false
-              terraform apply -input=false -auto-approve
+              terraform plan -var-file=terraform.tfvars -input=false
+              terraform apply -var-file=terraform.tfvars -input=false -auto-approve
             displayName: 'Run Terraform for Security'
-            env:
-              ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-              ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-              ARM_TENANT_ID: $(ARM_TENANT_ID)
-              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
 
           - script: |
+              echo "Generating terraform.tfvars for Policy"
+              envsubst < LZ-Terraform/policy/terraform.tfvars.template > LZ-Terraform/policy/terraform.tfvars
               cd LZ-Terraform/policy
               terraform init
-              terraform plan -input=false
-              terraform apply -input=false -auto-approve
+              terraform plan -var-file=terraform.tfvars -input=false
+              terraform apply -var-file=terraform.tfvars -input=false -auto-approve
             displayName: 'Run Terraform for Policy'
-            env:
-              ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-              ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-              ARM_TENANT_ID: $(ARM_TENANT_ID)
-              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)

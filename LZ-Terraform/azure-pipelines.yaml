@@ -10,10 +10,10 @@ variables:
   - group: WiseOldTurtleSP  # Your variable group containing secrets
 
 stages:
-  - stage: DeployLZ
+  - stage: DeployLandingZone
     jobs:
-      - job: Deploy_CoreResources
-        displayName: 'Run Terrafom init plan and deploy'
+      - job: DeployCoreResources
+        displayName: 'Run Terraform Commands'
         steps:
           - script: |
               echo "Generating terraform.tfvars for Networking"

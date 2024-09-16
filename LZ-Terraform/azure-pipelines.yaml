@@ -8,7 +8,7 @@ pool:
 
 variables:
   - group: WiseOldTurtleSP  # Variable group where secrets are stored
-  - template: variables.yml # reusable YAML templates which define common configurations / reduce duplication.
+  - template: variables.yaml # reusable YAML templates which define common configurations / reduce duplication.
 
 stages:
   - stage: Deploy

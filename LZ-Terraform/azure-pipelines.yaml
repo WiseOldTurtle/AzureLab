@@ -12,8 +12,8 @@ variables:
 stages:
   - stage: DeployLZ
     jobs:
-      - job: 'Deploy Core Resources'
-        displayName: 'Run Terrafom init,plan and deploy'
+      - job: Deploy Core Resources
+        displayName: 'Run Terrafom init plan and deploy'
         steps:
           - script: |
               echo "Generating terraform.tfvars for Networking"

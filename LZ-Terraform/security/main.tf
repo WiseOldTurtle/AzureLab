@@ -1,3 +1,11 @@
+provider "azurerm" {
+  features {}
+  tenant_id       = var.tenant_id
+  client_id       = var.client_id
+  client_secret   = var.client_secret
+  subscription_id = var.subscription_id
+}
+
 resource "azurerm_network_security_group" "frontend_nsg" {
   name                = "frontend-nsg"
   location            = var.location

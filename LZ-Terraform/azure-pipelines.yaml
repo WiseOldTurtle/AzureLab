@@ -11,15 +11,10 @@ variables:
   - template: variables.yaml # Reusable YAML templates which define common configurations / reduce duplication.
 
 stages:
-  - stage: Deploy
+  - stage: DeployLZ
     jobs:
-      - job: TerraformJob
+      - job: DeployCoreResources
         displayName: 'Run Terraform Commands'
-        env:
-          ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-          ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-          ARM_TENANT_ID: $(ARM_TENANT_ID)
-          ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
         steps:
           - script: |
               cd LZ-Terraform/networking
@@ -27,6 +22,11 @@ stages:
               terraform plan
               terraform apply -auto-approve
             displayName: 'Run Terraform for Networking'
+            env:
+              ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+              ARM_TENANT_ID: $(ARM_TENANT_ID)
+              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
 
           - script: |
               cd LZ-Terraform/security
@@ -34,6 +34,11 @@ stages:
               terraform plan
               terraform apply -auto-approve
             displayName: 'Run Terraform for Security'
+            env:
+              ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+              ARM_TENANT_ID: $(ARM_TENANT_ID)
+              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
 
           - script: |
               cd LZ-Terraform/policy
@@ -41,3 +46,8 @@ stages:
               terraform plan
               terraform apply -auto-approve
             displayName: 'Run Terraform for Policy'
+            env:
+              ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+              ARM_TENANT_ID: $(ARM_TENANT_ID)
+              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)

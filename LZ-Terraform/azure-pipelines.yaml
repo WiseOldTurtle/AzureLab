@@ -6,27 +6,33 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-# References Variable Group 
 variables:
-  - group: WiseOldTurtleSP
+  - group: WiseOldTurtleSP  # Variable group where secrets are stored
+  - template: variables.yml # reusable YAML templates which define common configurations / reduce duplication.
 
-steps:
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: 'wiseoldturtle-terraform-sp'
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        echo "ARM_CLIENT_ID=$(ARM_CLIENT_ID)"
-        echo "ARM_TENANT_ID=$(ARM_TENANT_ID)"
-        # Using secrets in scripts
-        az login --service-principal -u $(ARM_CLIENT_ID) -p $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
-        az account set --subscription $(ARM_SUBSCRIPTION_ID)
-        terraform init
-        terraform plan
-        terraform apply -auto-approve
-    env:
-      ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-      ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)   # Secure secret
-      ARM_TENANT_ID: $(ARM_TENANT_ID)
-      ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+stages:
+  - stage: Deploy
+    jobs:
+      - job: TerraformJob
+        displayName: 'Run Terraform Commands'
+        steps:
+          - script: |
+              cd networking
+              terraform init
+              terraform plan
+              terraform apply -auto-approve
+            displayName: 'Run Terraform for Networking'
+
+          - script: |
+              cd security
+              terraform init
+              terraform plan
+              terraform apply -auto-approve
+            displayName: 'Run Terraform for Security'
+
+          - script: |
+              cd policy
+              terraform init
+              terraform plan
+              terraform apply -auto-approve
+            displayName: 'Run Terraform for Policy'

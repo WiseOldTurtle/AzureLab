@@ -12,7 +12,7 @@ variables:
 stages:
   - stage: DeployLZ
     jobs:
-      - job: Deploy Core Resources
+      - job: Deploy_CoreResources
         displayName: 'Run Terrafom init plan and deploy'
         steps:
           - script: |

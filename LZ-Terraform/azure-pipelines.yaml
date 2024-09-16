@@ -8,13 +8,18 @@ pool:
 
 variables:
   - group: WiseOldTurtleSP  # Variable group where secrets are stored
-  - template: variables.yaml # reusable YAML templates which define common configurations / reduce duplication.
+  - template: variables.yaml # Reusable YAML templates which define common configurations / reduce duplication.
 
 stages:
   - stage: Deploy
     jobs:
       - job: TerraformJob
         displayName: 'Run Terraform Commands'
+        env:
+          ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+          ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+          ARM_TENANT_ID: $(ARM_TENANT_ID)
+          ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
         steps:
           - script: |
               cd LZ-Terraform/networking

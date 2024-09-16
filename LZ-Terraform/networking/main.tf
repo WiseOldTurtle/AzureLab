@@ -9,8 +9,8 @@ resource "azurerm_virtual_network" "frontend" {
   resource_group_name = var.resource_group_name
 
   subnet {
-    name           = "frontend-subnet"
-    address_prefix = "10.0.1.0/24"
+    name             = "frontend-subnet"
+    address_prefixes = "10.0.1.0/24"
   }
 }
 
@@ -21,8 +21,8 @@ resource "azurerm_virtual_network" "backend" {
   resource_group_name = var.resource_group_name
 
   subnet {
-    name           = "backend-subnet"
-    address_prefix = "10.1.1.0/24"
+    name             = "backend-subnet"
+    address_prefixes = "10.1.1.0/24"
   }
 }
 
@@ -33,7 +33,7 @@ resource "azurerm_virtual_network" "dev" {
   resource_group_name = var.resource_group_name
 
   subnet {
-    name           = "dev-subnet"
-    address_prefix = "10.2.1.0/24"
+    name             = "dev-subnet"
+    address_prefixes = "10.2.1.0/24"
   }
 }

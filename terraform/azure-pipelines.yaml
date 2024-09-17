@@ -14,7 +14,7 @@ variables:
 
 
 stages :
-  - stage: InititalTerraformTasks
+  - stage: InitialTerraformTasks
     jobs:
     - job: validate
       continueOnError: false
@@ -25,18 +25,18 @@ stages :
           terraformVersion: 'latest'
       
       - task: TerraformTaskV2@2
-        displayName: 'init'
+        displayName: 'TF INIT'
         inputs:
           provider: 'azurerm'
           command: 'init'
           backendServiceArm: 'wiseoldturtle-terraform-sp'
-          backendAzureRmResourceGroupName: '${{ variables.backendAzureRmResourceGroupName}}'
-          backendAzureRmStorageAccountName: '${{ variables.backendAzureRmStorageAccountName}}'
-          backendAzureRmContainerName: '${{ variables.backendAzureRmContainerName }}'
-          backendAzureRmKey: 'terraform.tfstate'
+          backendAzureRmResourceGroupName: $(backendAzureRmResourceGroupName)
+          backendAzureRmStorageAccountName: $(backendAzureRmStorageAccountName)
+          backendAzureRmContainerName: $(backendAzureRmContainerName)
+          backendAzureRmKey: 'prod.terraform.tfstate'
       
       - task: TerraformTaskV2@2
-        displayName: 'validate'
+        displayName: 'TF Validate'
         inputs:
           provider: 'azurerm'
           command: 'validate'

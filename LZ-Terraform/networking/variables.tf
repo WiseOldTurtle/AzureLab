@@ -10,22 +10,22 @@ variable "location" {
   default     = "UK South"
 }
 
-variable "tenant_id" {
+variable "TENANT_ID" {
   description = "The Azure Tenant ID."
   type        = string
 }
 
-variable "client_id" {
+variable "CLIENT_ID" {
   description = "The Azure Client ID."
   type        = string
 }
 
-variable "client_secret" {
+variable "SECRET" {
   description = "The Azure Client Secret."
   type        = string
 }
 
-variable "subscription_id" {
+variable "SUBSCRIPTION_ID" {
   description = "The Azure Subscription ID."
   type        = string
 }

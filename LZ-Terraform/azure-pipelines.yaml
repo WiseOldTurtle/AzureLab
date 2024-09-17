@@ -24,20 +24,20 @@ stages:
               terraform apply -var-file=terraform.tfvars -input=false -auto-approve
             displayName: 'Run Terraform for Networking'
 
-          - script: |
-              echo "Generating terraform.tfvars for Security"
-              envsubst < LZ-Terraform/security/terraform.tfvars.template > LZ-Terraform/security/terraform.tfvars
-              cd LZ-Terraform/security
-              terraform init
-              terraform plan -var-file=terraform.tfvars -input=false
-              terraform apply -var-file=terraform.tfvars -input=false -auto-approve
-            displayName: 'Run Terraform for Security'
+          # - script: |
+          #     echo "Generating terraform.tfvars for Security"
+          #     envsubst < LZ-Terraform/security/terraform.tfvars.template > LZ-Terraform/security/terraform.tfvars
+          #     cd LZ-Terraform/security
+          #     terraform init
+          #     terraform plan -var-file=terraform.tfvars -input=false
+          #     terraform apply -var-file=terraform.tfvars -input=false -auto-approve
+          #   displayName: 'Run Terraform for Security'
 
-          - script: |
-              echo "Generating terraform.tfvars for Policy"
-              envsubst < LZ-Terraform/policy/terraform.tfvars.template > LZ-Terraform/policy/terraform.tfvars
-              cd LZ-Terraform/policy
-              terraform init
-              terraform plan -var-file=terraform.tfvars -input=false
-              terraform apply -var-file=terraform.tfvars -input=false -auto-approve
-            displayName: 'Run Terraform for Policy'
+          # - script: |
+          #     echo "Generating terraform.tfvars for Policy"
+          #     envsubst < LZ-Terraform/policy/terraform.tfvars.template > LZ-Terraform/policy/terraform.tfvars
+          #     cd LZ-Terraform/policy
+          #     terraform init
+          #     terraform plan -var-file=terraform.tfvars -input=false
+          #     terraform apply -var-file=terraform.tfvars -input=false -auto-approve
+          #   displayName: 'Run Terraform for Policy'

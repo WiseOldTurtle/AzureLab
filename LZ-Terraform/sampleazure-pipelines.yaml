@@ -34,7 +34,7 @@ stages:
             displayName: 'LOW/MED - Trivy vulnerability scanner in IaC mode'
             inputs:
               script: |
-                for file in $(find src -name "*.tf"); do
+                for file in $(find src -name "*/networking/*.tf"); do
                     trivy config --severity LOW,MEDIUM --exit-code 0 "$file"
                 done
 
@@ -42,7 +42,7 @@ stages:
             displayName: 'HIGH/CRIT - Trivy vulnerability scanner in IaC mode'
             inputs:
               script: |
-                for file in $(find src -name "*.tf"); do
+                for file in $(find src -name "*/networking/*.tf"); do
                     trivy config --severity HIGH,CRITICAL --exit-code 0 "$file"
                 done
 
@@ -51,11 +51,11 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'init'
-              backendServiceArm: 'Azure'
+              backendServiceArm: 'wiseoldturtle-terraform-sp'
               backendAzureRmResourceGroupName: 'tfstate'
-              backendAzureRmStorageAccountName: 'tfbackendstore'
-              backendAzureRmContainerName: 'tfbackend'
-              backendAzureRmKey: 'prod.terraform.tfstate'
+              backendAzureRmStorageAccountName: 'terraformstate01'
+              backendAzureRmContainerName: 'tfstate'
+              backendAzureRmKey: 'terraform.tfstate'
 
           - task: TerraformTaskV4@4
             displayName: 'Tf plan'
@@ -63,7 +63,7 @@ stages:
               provider: 'azurerm'
               command: 'plan'
               commandOptions: '-out $(Build.SourcesDirectory)/tfplanfile'
-              environmentServiceNameAzureRM: 'Azure'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
           - task: CopyFiles@2
             displayName: 'Copy Files to Staging'

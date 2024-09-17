@@ -48,9 +48,10 @@ stages :
         steps:
           - script: |
               echo "Generating terraform.tfvars for Networking"
-              envsubst < LZ-Terraform/networking/terraform.tfvars.template > LZ-Terraform/networking/terraform.tfvars
-              cd LZ-Terraform/networking
+              envsubst < terraform/networking/terraform.tfvars.template > terraform/networking/terraform.tfvars
+              cd terraform/networking
               terraform init
+              echo "Generating Terraform Plan for Networking"
               terraform plan -input=false -var CLIENT_SECRET=$(TF_VARS_client_secret) -var-file=terraform.tfvars
           #    terraform apply -var-file=terraform.tfvars -input=false -auto-approve
             displayName: 'Run Terraform for Networking'

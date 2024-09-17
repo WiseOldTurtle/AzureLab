@@ -20,7 +20,7 @@ variable "CLIENT_ID" {
   type        = string
 }
 
-variable "SECRET" {
+variable "CLIENT_SECRET" {
   description = "The Azure Client Secret."
   type        = string
 }

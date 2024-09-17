@@ -1,10 +1,10 @@
 provider "azurerm" {
   features {}
 
-  subscription_id = var.subscription_id
-  tenant_id       = var.tenant_id
-  client_id       = var.client_id
-  client_secret   = var.client_secret
+  subscription_id = var.SUBSCRIPTION_ID
+  tenant_id       = var.TENANT_ID
+  client_id       = var.CLIENT_ID
+  client_secret   = var.CLIENT_SECRET
 }
 
 resource "azurerm_virtual_network" "frontend" {

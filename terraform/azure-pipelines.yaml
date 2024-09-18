@@ -41,7 +41,7 @@ stages:
                 --location "UK South" \
                 --sku Standard_LRS \
                 --kind StorageV2 \
-                --access-tier Hot
+                --access-tier Hot \
                 --public-network-access disabled
             displayName: 'Create Storage Account'
 

@@ -90,6 +90,7 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'init'
+              backendServiceArm: 'wiseoldturtle-sp-terraform'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
 
           - task: TerraformTaskV2@2
@@ -117,6 +118,7 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'init'
+              backendServiceArm: 'wiseoldturtle-sp-terraform'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
 
           - task: TerraformTaskV2@2
@@ -149,6 +151,7 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'init'
+              backendServiceArm: 'wiseoldturtle-sp-terraform'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
 
           - task: TerraformTaskV2@2

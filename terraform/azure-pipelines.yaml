@@ -55,11 +55,22 @@ stages:
           #       --subnet 
           #   displayName: 'Configure Network Rules for Storage Account'
 
-          # Step 4: Create Storage Container
+          # Retrieve Storage Account Key for container creation
+          - script: |
+              STORAGE_ACCOUNT_KEY=$(az storage account keys list \
+                --resource-group $(backendAzureRmResourceGroupName) \
+                --account-name $(backendAzureRmStorageAccountName) \
+                --query '[0].value' \
+                --output tsv)
+              echo "##vso[task.setvariable variable=STORAGE_ACCOUNT_KEY]$STORAGE_ACCOUNT_KEY"
+            displayName: 'Retrieve Storage Account Key'
+
+          # Create Storage Container using the retrieved key
           - script: |
               az storage container create \
                 --name tfstate \
-                --account-name $(backendAzureRmStorageAccountName)
+                --account-name $(backendAzureRmStorageAccountName) \
+                --account-key $(STORAGE_ACCOUNT_KEY)
             displayName: 'Create Storage Container for Terraform Backend'
 
 
@@ -127,7 +138,7 @@ stages:
       - job: DeployPolicy
         displayName: 'Deploy Policy Resources'
         steps:
-          # Step 7: Initialize Terraform and deploy resources for Policy
+          # Initialize Terraform and deploy resources for Policy
           - task: TerraformInstaller@0
             displayName: 'Install Terraform'
             inputs:

@@ -30,7 +30,8 @@ stages:
 
           # Resource Group Creation
           - script: |
-              az group create --name $(backendAzureRmResourceGroupName) --location "UK South"
+              az group create --name $(backendAzureRmResourceGroupName) \ 
+              --location "UK South"
             displayName: 'Create Resource Group'
 
           # Create Storage Account with Private Access
@@ -91,6 +92,10 @@ stages:
               provider: 'azurerm'
               command: 'init'
               backendServiceArm: 'wiseoldturtle-terraform-sp'
+              backendAzureRmResourceGroupName: $(backendAzureRmResourceGroupName)
+              backendAzureRmStorageAccountName: $(backendAzureRmStorageAccountName)
+              backendAzureRmContainerName: 'tfstate'
+              backendAzureRmKey: 'networking.tfstate'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
 
           - task: TerraformTaskV2@2
@@ -119,6 +124,10 @@ stages:
               provider: 'azurerm'
               command: 'init'
               backendServiceArm: 'wiseoldturtle-terraform-sp'
+              backendAzureRmResourceGroupName: $(backendAzureRmResourceGroupName)
+              backendAzureRmStorageAccountName: $(backendAzureRmStorageAccountName)
+              backendAzureRmContainerName: 'tfstate'
+              backendAzureRmKey: 'security.tfstate'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
 
           - task: TerraformTaskV2@2
@@ -152,6 +161,10 @@ stages:
               provider: 'azurerm'
               command: 'init'
               backendServiceArm: 'wiseoldturtle-terraform-sp'
+              backendAzureRmResourceGroupName: $(backendAzureRmResourceGroupName)
+              backendAzureRmStorageAccountName: $(backendAzureRmStorageAccountName)
+              backendAzureRmContainerName: 'tfstate'
+              backendAzureRmKey: 'policy.tfstate'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
 
           - task: TerraformTaskV2@2

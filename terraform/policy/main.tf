@@ -3,12 +3,12 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "rg-policy-wotlab01" {
-  name     = "Identity"
+  name     = "rg-policy-wotlab01"
   location = "UK South"
 }
 
 resource "azurerm_resource_group" "rg-vmpool-wotlab01" {
-  name     = "Identity"
+  name     = "rg-vmpool-wotlab01"
   location = "UK South"
 }
 
@@ -56,6 +56,6 @@ resource "azurerm_resource_group_policy_assignment" "platform_vm_size_policy" {
 
 resource "azurerm_resource_group_policy_assignment" "application_vm_size_policy" {
   name                 = "application-vm-size-policy"
-  resource_group_id    = azurerm_resource_group.application_rg.id
+  resource_group_id    = azurerm_resource_group.rg-vmpool-wotlab01.id
   policy_definition_id = azurerm_policy_definition.vm_size_policy.id
 }

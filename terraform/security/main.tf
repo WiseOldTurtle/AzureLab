@@ -3,8 +3,8 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "rg-nsg-wotlab01" {
-  name     = "Identity"
-  location = "UK South"
+  name     = var.resource_group_name
+  location = var.location
 }
 
 resource "azurerm_network_security_group" "frontend_nsg" {

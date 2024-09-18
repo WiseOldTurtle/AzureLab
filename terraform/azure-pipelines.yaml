@@ -9,76 +9,122 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  - group: WiseOldTurtleSP  # Your variable group containing secrets
-  - group: terraform
+  - group: WiseOldTurtleSP  # Variable group containing SP details
+  - group: terraform        # Variable group containing Terraform-related variables
+  - name: TF_VARS_subscription_id
+    value: $(TF_VARS_subscription_id)  # Reference the variable from the Azure DevOps variable group
 
-
-stages :
-  - stage: InitialTerraformTasks
+stages:
+  - stage: SetupBackend
     jobs:
-    - job: validate
-      continueOnError: false
-      steps:
-      - task: TerraformInstaller@0
-        displayName: 'install'
-        inputs:
-          terraformVersion: 'latest'
-      
-      - task: TerraformTaskV2@2
-        displayName: 'TF INIT'
-        inputs:
-          provider: 'azurerm'
-          command: 'init'
-          backendServiceArm: 'wiseoldturtle-terraform-sp'
-          backendAzureRmResourceGroupName: $(backendAzureRmResourceGroupName)
-          backendAzureRmStorageAccountName: $(backendAzureRmStorageAccountName)
-          backendAzureRmContainerName: $(backendAzureRmContainerName)
-          backendAzureRmKey: 'prod.terraform.tfstate'
-      
-      - task: TerraformTaskV2@2
-        displayName: 'TF Validate'
-        inputs:
-          provider: 'azurerm'
-          command: 'validate'
-
-  - stage: DeployLandingZone
-    jobs:
-      - job: DeployCoreResources
-        displayName: 'Run Terraform Commands'
+      - job: CreateBackendContainer
+        displayName: 'Create Backend Container'
         steps:
+          # Step 1: Azure CLI Login using Service Principal
           - script: |
-              echo "Generating terraform.tfvars for Networking"
-              envsubst < terraform/networking/terraform.tfvars.template > terraform/networking/terraform.tfvars
-              cd terraform/networking
-              terraform init
-              echo "Generating Terraform Plan for Networking"
-              terraform plan -input=false -var CLIENT_SECRET=$(TF_VARS_client_secret) -var-file=terraform.tfvars
-          #    terraform apply -var-file=terraform.tfvars -input=false -auto-approve
-            displayName: 'Run Terraform for Networking'
+              az login --service-principal \
+                --username $(TF_VAR_client_id) \
+                --password $(TF_VAR_client_secret) \
+                --tenant $(TF_VAR_tenant_id)
+            displayName: 'Azure Login with SP'
 
-          # - script: |
-          #     echo "Generating terraform.tfvars for Security"
-          #     envsubst < LZ-Terraform/security/terraform.tfvars.template > LZ-Terraform/security/terraform.tfvars
-          #     cd LZ-Terraform/security
-          #     terraform init
-          #     terraform plan -var-file=terraform.tfvars -input=false
-          #     terraform apply -var-file=terraform.tfvars -input=false -auto-approve
-          #   displayName: 'Run Terraform for Security'
+          # Step 2: Create storage container for the Terraform backend
+          - script: |
+              az storage container create \
+                --name tfstate \
+                --account-name $(TF_VAR_storage_account_name) \
+                --resource-group $(TF_VAR_resource_group_name)
+            displayName: 'Create Storage Container for Terraform Backend'
 
-          # - script: |
-          #     echo "Generating terraform.tfvars for Policy"
-          #     envsubst < LZ-Terraform/policy/terraform.tfvars.template > LZ-Terraform/policy/terraform.tfvars
-          #     cd LZ-Terraform/policy
-          #     terraform init
-          #     terraform plan -var-file=terraform.tfvars -input=false
-          #     terraform apply -var-file=terraform.tfvars -input=false -auto-approve
-          #   displayName: 'Run Terraform for Policy'      
- 
-      # - task: TerraformTaskV2@2
-      #   displayName: 'apply'
-      #   inputs:
-      #     provider: 'azurerm'
-      #     command: 'apply'
-      #     commandOptions: '-input=false -var name=$(name) -var environment=$(Environment) -var-file="../terraform/environments/$(Environment)/$(Environment).tfvars"'
-      #     environmentServiceNameAzureRM: 'thomasthorntoncloud'
-      #     workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
+  - stage: DeployResources
+    jobs:
+      - job: DeployNetworking
+        displayName: 'Deploy Networking Resources'
+        steps:
+          # Step 3: Initialize Terraform and deploy resources for Networking
+          - task: TerraformInstaller@0
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: 'latest'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Init (Networking)'
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Plan (Networking)'
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Apply (Networking)'
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              commandOptions: '-auto-approve -var subscription_id=$(TF_VARS_subscription_id)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
+
+      - job: DeploySecurity
+        displayName: 'Deploy Security Resources'
+        steps:
+          # Step 4: Initialize Terraform and deploy resources for Security
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Init (Security)'
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Plan (Security)'
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Apply (Security)'
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              commandOptions: '-auto-approve -var subscription_id=$(TF_VARS_subscription_id)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
+
+      - job: DeployPolicy
+        displayName: 'Deploy Policy Resources'
+        steps:
+          # Step 5: Initialize Terraform and deploy resources for Policy
+          - task: TerraformInstaller@0
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: 'latest'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Init (Policy)'
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Plan (Policy)'
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Apply (Policy)'
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              commandOptions: '-auto-approve -var subscription_id=$(TF_VARS_subscription_id)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'

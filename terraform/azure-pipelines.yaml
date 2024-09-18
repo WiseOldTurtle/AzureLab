@@ -30,8 +30,7 @@ stages:
 
           # Resource Group Creation
           - script: |
-              az group create --name $(backendAzureRmResourceGroupName) \ 
-              --location "UK South"
+              az group create --name $(backendAzureRmResourceGroupName) --location "UK South"
             displayName: 'Create Resource Group'
 
           # Create Storage Account with Private Access

@@ -42,7 +42,6 @@ stages:
                 --sku Standard_LRS \
                 --kind StorageV2 \
                 --access-tier Hot
-                --allow-blob-public-access false \
                 --public-network-access disabled
             displayName: 'Create Storage Account'
 

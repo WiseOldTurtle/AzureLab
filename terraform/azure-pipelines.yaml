@@ -102,7 +102,7 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'plan'
-              commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
+         #    commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
               environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
@@ -111,7 +111,7 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'apply'
-              commandOptions: '-auto-approve -var subscription_id=$(TF_VARS_subscription_id)'
+              commandOptions: '-auto-approve'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
               environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
@@ -136,7 +136,7 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'plan'
-              commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
+          #   commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
               environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
@@ -145,7 +145,7 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'apply'
-              commandOptions: '-auto-approve -var subscription_id=$(TF_VARS_subscription_id)'
+              commandOptions: '-auto-approve'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
               environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
@@ -175,7 +175,7 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'plan'
-              commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
+          #   commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
               environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
@@ -184,6 +184,6 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'apply'
-              commandOptions: '-auto-approve -var subscription_id=$(TF_VARS_subscription_id)'
+              commandOptions: '-auto-approve'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
               environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'

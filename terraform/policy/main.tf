@@ -2,68 +2,49 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_policy_definition" "no_public_ip" {
-  name         = "deny-public-ip"
+resource "azurerm_policy_definition" "vm_size_policy" {
+  name         = "Restrict VM Sizes"
+  display_name = "Restrict VM Sizes"
+  description  = "Restrict virtual machine sizes in the specified resource groups"
   policy_type  = "Custom"
   mode         = "All"
-  display_name = "Deny Public IP Creation"
 
-  policy_rule = <<POLICY
-  {
-    "if": {
-      "allOf": [
-        {
-          "field": "type",
-          "equals": "Microsoft.Network/publicIPAddresses"
-        }
-      ]
-    },
-    "then": {
-      "effect": "Deny"
-    }
-  }
-  POLICY
-}
 
-resource "azurerm_policy_assignment" "no_public_ip_assignment" {
-  name                 = "no-public-ip-assignment"
-  policy_definition_id = azurerm_policy_definition.no_public_ip.id
-  scope                = "/subscriptions/${var.subscription_id}"
-}
-
-resource "azurerm_policy_definition" "vm_sku_policy" {
-  name         = "limit-vm-skus"
-  policy_type  = "Custom"
-  mode         = "All"
-  display_name = "Limit VM SKUs to Small Sizes"
-
-  policy_rule = <<POLICY
-  {
-    "if": {
-      "allOf": [
-        {
-          "field": "type",
-          "equals": "Microsoft.Compute/virtualMachines"
-        },
-        {
+  policy_rule = <<POLICY_RULE
+{
+  "if": {
+    "allOf": [
+      {
+        "field": "type",
+        "equals": "Microsoft.Compute/virtualMachines"
+      },
+      {
+        "not": {
           "field": "Microsoft.Compute/virtualMachines/sku.name",
-          "notIn": [
+          "in": [
             "Standard_B1ls",
             "Standard_B1s",
-            "Standard_B2s"
+            "Standard_B1ms"
           ]
         }
-      ]
-    },
-    "then": {
-      "effect": "Deny"
-    }
+      }
+    ]
+  },
+  "then": {
+    "effect": "deny"
   }
-  POLICY
+}
+POLICY_RULE
 }
 
-resource "azurerm_policy_assignment" "vm_sku_policy_assignment" {
-  name                 = "vm-sku-assignment"
-  policy_definition_id = azurerm_policy_definition.vm_sku_policy.id
-  scope                = "/subscriptions/${var.subscription_id}"
+resource "azurerm_resource_group_policy_assignment" "platform_vm_size_policy" {
+  name                 = "platform-vm-size-policy"
+  resource_group_id    = azurerm_resource_group.platform_management_rg.id
+  policy_definition_id = azurerm_policy_definition.vm_size_policy.id
+}
+
+resource "azurerm_resource_group_policy_assignment" "application_vm_size_policy" {
+  name                 = "application-vm-size-policy"
+  resource_group_id    = azurerm_resource_group.application_rg.id
+  policy_definition_id = azurerm_policy_definition.vm_size_policy.id
 }

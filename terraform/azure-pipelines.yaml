@@ -45,14 +45,7 @@ stages:
                 --public-network-access disabled
             displayName: 'Create Storage Account'
 
-          # Step 4: Create Storage Container
-          - script: |
-              az storage container create \
-                --name tfstate \
-                --account-name $(backendAzureRmStorageAccountName)
-            displayName: 'Create Storage Container for Terraform Backend'
-
-          # Step 5: Configure Network Rules for Storage Account
+          # Set Network Rules for Storage Account  
           - script: |
               az storage account network-rule add \
                 --resource-group $(backendAzureRmResourceGroupName) \
@@ -60,7 +53,15 @@ stages:
                 --bypass AzureServices 
             displayName: 'Configure Network Rules for Storage Account'
 
-  - stage: DeployResources
+          # Step 4: Create Storage Container
+          - script: |
+              az storage container create \
+                --name tfstate \
+                --account-name $(backendAzureRmStorageAccountName)
+            displayName: 'Create Storage Container for Terraform Backend'
+
+
+  - stage: DeployCoreResources
     jobs:
       - job: DeployNetworking
         displayName: 'Deploy Networking Resources'

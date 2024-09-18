@@ -2,6 +2,11 @@
     features {}
   }
 
+resource "azurerm_resource_group" "rg-vnet-wotlab01" {
+  name     = "Identity"
+  location = "UK South"
+}
+
   resource "azurerm_virtual_network" "frontend" {
     name                = "vn-fe-wotlab01"
     address_space       = ["10.0.0.0/16"]

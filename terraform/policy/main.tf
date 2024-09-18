@@ -2,6 +2,17 @@ provider "azurerm" {
   features {}
 }
 
+resource "azurerm_resource_group" "rg-policy-wotlab01" {
+  name     = "Identity"
+  location = "UK South"
+}
+
+resource "azurerm_resource_group" "rg-vmpool-wotlab01" {
+  name     = "Identity"
+  location = "UK South"
+}
+
+
 resource "azurerm_policy_definition" "vm_size_policy" {
   name         = "Restrict VM Sizes"
   display_name = "Restrict VM Sizes"
@@ -39,7 +50,7 @@ POLICY_RULE
 
 resource "azurerm_resource_group_policy_assignment" "platform_vm_size_policy" {
   name                 = "platform-vm-size-policy"
-  resource_group_id    = azurerm_resource_group.platform_management_rg.id
+  resource_group_id    = azurerm_resource_group.rg-policy-wotlab01
   policy_definition_id = azurerm_policy_definition.vm_size_policy.id
 }
 

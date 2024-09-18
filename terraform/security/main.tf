@@ -2,6 +2,11 @@ provider "azurerm" {
   features {}
 }
 
+resource "azurerm_resource_group" "rg-nsg-wotlab01" {
+  name     = "Identity"
+  location = "UK South"
+}
+
 resource "azurerm_network_security_group" "frontend_nsg" {
   name                = "frontend-nsg"
   location            = var.location

@@ -45,13 +45,15 @@ stages:
                 --public-network-access disabled
             displayName: 'Create Storage Account'
 
-          # Set Network Rules for Storage Account  
-          - script: |
-              az storage account network-rule add \
-                --resource-group $(backendAzureRmResourceGroupName) \
-                --account-name $(backendAzureRmStorageAccountName) \
-                --bypass AzureServices 
-            displayName: 'Configure Network Rules for Storage Account'
+          # # Set Network Rules for Storage Account  
+          # - script: |
+          #     az storage account network-rule add \
+          #       --resource-group $(backendAzureRmResourceGroupName) \
+          #       --account-name $(backendAzureRmStorageAccountName) \
+          #       --bypass AzureServices \
+          #       --vnet \
+          #       --subnet 
+          #   displayName: 'Configure Network Rules for Storage Account'
 
           # Step 4: Create Storage Container
           - script: |

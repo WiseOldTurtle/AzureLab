@@ -17,8 +17,8 @@ variables:
 stages:
   - stage: SetupBackend
     jobs:
-      - job: CreateBackendContainer
-        displayName: 'Create Backend Container'
+      - job: CreateBackendResources
+        displayName: 'Create Backend Resources'
         steps:
           # Step 1: Azure CLI Login using Service Principal
           - script: |
@@ -28,12 +28,27 @@ stages:
                 --tenant $(TF_VAR_tenant_id)
             displayName: 'Azure Login with SP'
 
-          # Step 2: Create storage container for the Terraform backend
+          # Step 2: Create Resource Group
+          - script: |
+              az group create --name $(backendAzureRmResourceGroupName) --location "UK South"
+            displayName: 'Create Resource Group'
+
+          # Step 3: Create Storage Account
+          - script: |
+              az storage account create \
+                --name $(backendAzureRmStorageAccountName) \
+                --resource-group $(backendAzureRmResourceGroupName) \
+                --location "UK South" \
+                --sku Standard_LRS \
+                --kind StorageV2 \
+                --access-tier Hot
+            displayName: 'Create Storage Account'
+
+          # Step 4: Create Storage Container
           - script: |
               az storage container create \
                 --name tfstate \
-                --account-name $(backendAzureRmStorageAccountName) \
-                --resource-group $(backendAzureRmResourceGroupName)
+                --account-name $(backendAzureRmStorageAccountName)
             displayName: 'Create Storage Container for Terraform Backend'
 
   - stage: DeployResources
@@ -41,7 +56,7 @@ stages:
       - job: DeployNetworking
         displayName: 'Deploy Networking Resources'
         steps:
-          # Step 3: Initialize Terraform and deploy resources for Networking
+          # Step 5: Initialize Terraform and deploy resources for Networking
           - task: TerraformInstaller@0
             displayName: 'Install Terraform'
             inputs:
@@ -73,7 +88,7 @@ stages:
       - job: DeploySecurity
         displayName: 'Deploy Security Resources'
         steps:
-          # Step 4: Initialize Terraform and deploy resources for Security
+          # Step 6: Initialize Terraform and deploy resources for Security
           - task: TerraformTaskV2@2
             displayName: 'Terraform Init (Security)'
             inputs:
@@ -100,7 +115,7 @@ stages:
       - job: DeployPolicy
         displayName: 'Deploy Policy Resources'
         steps:
-          # Step 5: Initialize Terraform and deploy resources for Policy
+          # Step 7: Initialize Terraform and deploy resources for Policy
           - task: TerraformInstaller@0
             displayName: 'Install Terraform'
             inputs:

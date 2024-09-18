@@ -104,6 +104,7 @@ stages:
               command: 'plan'
               commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
           - task: TerraformTaskV2@2
             displayName: 'Terraform Apply (Networking)'
@@ -112,6 +113,7 @@ stages:
               command: 'apply'
               commandOptions: '-auto-approve -var subscription_id=$(TF_VARS_subscription_id)'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
       - job: DeploySecurity
         displayName: 'Deploy Security Resources'
@@ -136,6 +138,7 @@ stages:
               command: 'plan'
               commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
           - task: TerraformTaskV2@2
             displayName: 'Terraform Apply (Security)'
@@ -144,6 +147,7 @@ stages:
               command: 'apply'
               commandOptions: '-auto-approve -var subscription_id=$(TF_VARS_subscription_id)'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
       - job: DeployPolicy
         displayName: 'Deploy Policy Resources'
@@ -173,6 +177,7 @@ stages:
               command: 'plan'
               commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
           - task: TerraformTaskV2@2
             displayName: 'Terraform Apply (Policy)'
@@ -181,3 +186,4 @@ stages:
               command: 'apply'
               commandOptions: '-auto-approve -var subscription_id=$(TF_VARS_subscription_id)'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'

@@ -1,15 +1,16 @@
 # Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+This Repo is a collation of matierial I have created and used during my working career. It is still a work in progress, will be udpating regularly. Some of the resources within the repo are:
+- Landing Zone Deployments
+- Useful Powershell Scripts
+- YAML pipeline explanation
+- ARM templates have been broken down to explain resources and any smart logical fuctions used. 
 
 # Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+I have tried to breakdown the structure of the repo to be user friendly (more changes are coming over the next few weeks)
+1.	LZ-ARM: This folder is for building a landing zone using ARM templates. This was initially built as a release pipeline, however, due to CI/CD being on the rise I have remade a portion of it (so far) to install it as a YAML pipeline.
+2.	LZ-Terraform:
+3. 
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
 
 # Contribute
 TODO: Explain how other users and developers can contribute to make your code better. 

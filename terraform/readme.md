@@ -1,7 +1,7 @@
 # *Azure Landing Zone Project: Terraform, Azure DevOps, Security*
 
 **Key Tasks and Points:**
-- Aim to see if I can get some smart logic added into Terraform templates using local variables to create loops for repetitive areas such as Vnets and Subnets.
+- **DONE** Aim to see if I can get some smart logic added into Terraform templates using local variables to create loops for repetitive areas such as Vnets and Subnets.*Added in some logic using a ForEach and a Count to iterate VNets and Subnets*
 - See if I can get the YAML pipeline to pick up the backend.tf so I do not need to declare it in the YAML (to keep the YAML neater)
 - Add a task to destroy resources built to ensure costs are low.
 - Add in some sort of testing to the pipeline, through the use of trivy or terratest. Trivy sample is below (got it to work in early code):

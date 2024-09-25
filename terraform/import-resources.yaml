@@ -18,10 +18,6 @@ steps:
     terraformVersion: '0.12.12'
   displayName: Install Terraform
 
-# Install Azure CLI
-- task: AzureCli@1
-  displayName: 'Install Azure CLI'
-
 # Azure Login
 - script: |
     az login --service-principal \

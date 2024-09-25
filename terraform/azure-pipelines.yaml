@@ -72,14 +72,14 @@ stages:
 
           # Resource Group Creation
           - script: |
-              az group create --name $(backendAzureRmResourceGroupName) --location "UK South"
+              az group create --name $(backendRGName) --location "UK South"
             displayName: 'Create Resource Group'
 
           # Create Storage Account with Private Access
           - script: |
               az storage account create \
-                --name $(backendAzureRmStorageAccountName) \
-                --resource-group $(backendAzureRmResourceGroupName) \
+                --name $(backendStorageAccountName) \
+                --resource-group $(backendRGName) \
                 --location "UK South" \
                 --sku Standard_LRS \
                 --kind StorageV2 \
@@ -90,8 +90,8 @@ stages:
           # # Set Network Rules for Storage Account  
           # - script: |
           #     az storage account network-rule add \
-          #       --resource-group $(backendAzureRmResourceGroupName) \
-          #       --account-name $(backendAzureRmStorageAccountName) \
+          #       --resource-group $(backendRGName) \
+          #       --account-name $(backendStorageAccountName) \
           #       --bypass AzureServices \
           #       --vnet \
           #       --subnet 
@@ -100,8 +100,8 @@ stages:
           # Retrieve Storage Account Key for container creation
           - script: |
               STORAGE_ACCOUNT_KEY=$(az storage account keys list \
-                --resource-group $(backendAzureRmResourceGroupName) \
-                --account-name $(backendAzureRmStorageAccountName) \
+                --resource-group $(backendRGName) \
+                --account-name $(backendStorageAccountName) \
                 --query '[0].value' \
                 --output tsv)
               echo "##vso[task.setvariable variable=STORAGE_ACCOUNT_KEY]$STORAGE_ACCOUNT_KEY"
@@ -111,7 +111,7 @@ stages:
           - script: |
               az storage container create \
                 --name tfstate \
-                --account-name $(backendAzureRmStorageAccountName) \
+                --account-name $(backendStorageAccountName) \
                 --account-key $(STORAGE_ACCOUNT_KEY)
             displayName: 'Create Storage Container for Terraform Backend'
 
@@ -133,9 +133,9 @@ stages:
               provider: 'azurerm'
               command: 'init'
               backendServiceArm: 'wiseoldturtle-terraform-sp'
-              backendAzureRmResourceGroupName: $(backendAzureRmResourceGroupName)
-              backendAzureRmStorageAccountName: $(backendAzureRmStorageAccountName)
-              backendAzureRmContainerName: 'tfstate'
+              backendRGName: $(backendRGName)
+              backendStorageAccountName: $(backendStorageAccountName)
+              backendContainerName: $(backendContainerName)
               backendAzureRmKey: 'networking.tfstate'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
 
@@ -167,9 +167,9 @@ stages:
               provider: 'azurerm'
               command: 'init'
               backendServiceArm: 'wiseoldturtle-terraform-sp'
-              backendAzureRmResourceGroupName: $(backendAzureRmResourceGroupName)
-              backendAzureRmStorageAccountName: $(backendAzureRmStorageAccountName)
-              backendAzureRmContainerName: 'tfstate'
+              backendRGName: $(backendRGName)
+              backendStorageAccountName: $(backendStorageAccountName)
+              backendContainerName: $(backendContainerName)
               backendAzureRmKey: 'security.tfstate'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
 
@@ -206,9 +206,9 @@ stages:
               provider: 'azurerm'
               command: 'init'
               backendServiceArm: 'wiseoldturtle-terraform-sp'
-              backendAzureRmResourceGroupName: $(backendAzureRmResourceGroupName)
-              backendAzureRmStorageAccountName: $(backendAzureRmStorageAccountName)
-              backendAzureRmContainerName: 'tfstate'
+              backendRGName: $(backendRGName)
+              backendStorageAccountName: $(backendStorageAccountName)
+              backendContainerName: $(backendContainerName)
               backendAzureRmKey: 'policy.tfstate'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
 

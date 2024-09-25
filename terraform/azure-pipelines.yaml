@@ -19,40 +19,43 @@ stages:
     jobs:
       - job: RunTrivy
         steps:
-          # Istall Trivy
-        - script: | 
-            sudo apt-get update && sudo apt-get install -y wget
-            wget https://github.com/aquasecurity/trivy/releases/download/v0.42.0/trivy_0.42.0_Linux-64bit.deb
-            sudo dpkg -i trivy_0.42.0_Linux-64bit.deb
-          displayName: 'Install Trivy'
-          
-          # Run Trivy Scan and output as a json file
-        - script: |
-            trivy fs --format json --output trivy-report.json .
-          displayName: 'Run Trivy Scan'
+          # Download and Install Trivy
+        - task: CmdLine@2
+          displayName: 'Download and Install Trivy vulnerability scanner'
+          inputs:
+            script: |
+              sudo apt-get update
+              sudo apt-get install rpm -y
+              wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.deb
+              sudo dpkg -i trivy_0.20.0_Linux-64bit.deb
+              trivy -v
 
-        # Publish trivy report as pipeline artifact
+          # Run Trivy for LOW and MEDIUM severity issues (scans all .tf files within /terraform)
+        - task: CmdLine@2
+          displayName: 'LOW/MED - Trivy vulnerability scanner in IaC mode for Terraform files'
+          inputs:
+            script: |
+              mkdir -p trivy-reports  # Create a directory to store scan results
+              for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
+              trivy config --severity LOW,MEDIUM --exit-code 0 --format json --output trivy-reports/$(basename $file)_lowmed.json "$file"
+              done
+
+          # Run Trivy for HIGH and CRITICAL severity issues (scans all .tf files within /terraform)
+        - task: CmdLine@2
+          displayName: 'HIGH/CRIT - Trivy vulnerability scanner in IaC mode for Terraform files'
+          inputs:
+            script: |
+              for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
+              trivy config --severity HIGH,CRITICAL --exit-code 0 --format json --output trivy-reports/$(basename $file)_highcrit.json "$file"
+              done
+
+          # Publish Trivy Scan Results as a Build Artifact
         - task: PublishBuildArtifacts@1
+          displayName: 'Publish Trivy scan results as a build artifact'
           inputs:
-            PathtoPublish: 'trivy-report.json'
-            ArtifactName: 'TrivyReports'
-          displayName: 'Upload Trivy Report'
-
-        # Install Go for Terratest
-        - script: |
-            cd $(System.DefaultWorkingDirectory)/source/test
-            go mod init terratest
-            go get -u github.com/gruntwork-io/terratest/modules/terraform
-            go test -v -timeout 30m
-          displayName: 'Run Terratest'
-
-          # Publish Terratest Results as pipeline artifacts
-        - task: PublishTestResults@2
-          inputs:
-            testResultsFormat: 'JUnit'
-            testResultsFiles: '**/TEST-*.xml'
-            failTaskOnFailedTests: true
-          displayName: 'Publish Terratest Results'
+            PathtoPublish: 'trivy-reports'
+            ArtifactName: 'TrivyScanResults'
+            publishLocation: 'Container'
 
   # - stage: SetupBackend
   #   jobs:

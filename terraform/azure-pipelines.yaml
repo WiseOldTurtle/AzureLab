@@ -1,9 +1,9 @@
 name: $(BuildDefinitionName)_$(date:yyyyMMdd)$(rev:.r)
 
-trigger:
-  branches:
-    include:
-      - master
+trigger: none
+  # branches:
+  #   include:
+  #     - master
 
 pool:
   vmImage: 'ubuntu-latest'

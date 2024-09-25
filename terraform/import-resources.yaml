@@ -38,7 +38,7 @@ steps:
 - script: |
     terraform init \
     -backend-config="storage_account_name=$(backendAzureRmStorageAccountName)" \
-    -backend-config="container_name=$(containerName)" \
+    -backend-config="container_name=$(backendAzureRmContainerName)" \
     -backend-config="access_key=$(STORAGE_ACCOUNT_KEY)" \
     -backend-config="key=terraform.tfstate"
   displayName: 'Terraform Init'

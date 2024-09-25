@@ -1,0 +1,51 @@
+name: $(BuildDefinitionName)_$(date:yyyyMMdd)$(rev:.r)
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: WiseOldTurtleSP  # Variable group containing SP details
+  - group: terraform        # Variable group containing Terraform-related variables
+  - name: TF_VARS_subscription_id
+    value: $(TF_VARS_subscription_id)  # Reference the variable from the Azure DevOps variable group
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+# Install Terraform
+- task: hashicorpTerraformInstaller@0
+  displayName: 'Install Terraform'
+  inputs:
+    terraformVersion: '1.5.0'
+
+# Install Azure CLI
+- task: UseAzureCli@1
+  displayName: 'Install Azure CLI'
+
+# Azure Login
+- script: |
+    az login --service-principal \
+    --username $(TF_VAR_client_id) \
+    --password $(TF_VAR_client_secret) \
+    --tenant $(TF_VAR_tenant_id)
+  displayName: 'Azure Login with SP'
+
+
+# Import Resource Groups into Terraform State
+- script: |
+      declare -a rgs=("rg-nsg-wotlab01" "rg-vnet-wotlab01" "rg-vmpool-wotlab01" "rg-policy-wotlab01")
+      for rg in "${rgs[@]}"; do
+          resource_id=$(az group show --name "$rg" --query id --output tsv)
+          terraform import azurerm_resource_group.$rg $resource_id
+      done
+  displayName: 'Import Resource Groups into Terraform State'
+
+# Run Terraform Plan
+- script: |
+    terraform plan
+  displayName: 'Terraform Plan'
+
+    

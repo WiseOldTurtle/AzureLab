@@ -11,18 +11,15 @@ variables:
   - name: TF_VARS_subscription_id
     value: $(TF_VARS_subscription_id)  # Reference the variable from the Azure DevOps variable group
 
-pool:
-  vmImage: 'ubuntu-latest'
-
 steps:
 # Install Terraform
-- task: hashicorpTerraformInstaller@0
-  displayName: 'Install Terraform'
+- task: terraformInstaller@0
   inputs:
-    terraformVersion: '1.5.0'
+    terraformVersion: '0.12.12'
+  displayName: Install Terraform
 
 # Install Azure CLI
-- task: UseAzureCli@1
+- task: AzureCli@1
   displayName: 'Install Azure CLI'
 
 # Azure Login

@@ -133,9 +133,9 @@ stages:
               provider: 'azurerm'
               command: 'init'
               backendServiceArm: 'wiseoldturtle-terraform-sp'
-              backendRGName: $(backendRGName)
-              backendStorageAccountName: $(backendStorageAccountName)
-              backendContainerName: $(backendContainerName)
+              backendAzureRmResourceGroupName: $(backendRGName)
+              backendAzureRmStorageAccountName: $(backendStorageAccountName)
+              backendAzureRmContainerName: $(backendContainerName)
               backendAzureRmKey: 'networking.tfstate'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
 
@@ -167,9 +167,9 @@ stages:
               provider: 'azurerm'
               command: 'init'
               backendServiceArm: 'wiseoldturtle-terraform-sp'
-              backendRGName: $(backendRGName)
-              backendStorageAccountName: $(backendStorageAccountName)
-              backendContainerName: $(backendContainerName)
+              backendAzureRmResourceGroupName: $(backendRGName)
+              backendAzureRmStorageAccountName: $(backendStorageAccountName)
+              backendAzureRmContainerName: $(backendContainerName)
               backendAzureRmKey: 'security.tfstate'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
 
@@ -206,9 +206,9 @@ stages:
               provider: 'azurerm'
               command: 'init'
               backendServiceArm: 'wiseoldturtle-terraform-sp'
-              backendRGName: $(backendRGName)
-              backendStorageAccountName: $(backendStorageAccountName)
-              backendContainerName: $(backendContainerName)
+              backendAzureRmResourceGroupName: $(backendRGName)
+              backendAzureRmStorageAccountName: $(backendStorageAccountName)
+              backendAzureRmContainerName: $(backendContainerName)
               backendAzureRmKey: 'policy.tfstate'
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
 

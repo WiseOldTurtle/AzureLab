@@ -110,7 +110,7 @@ stages:
           # Create Storage Container using the retrieved key
           - script: |
               az storage container create \
-                --name tfstate \
+                --name $(backendContainerName) \
                 --account-name $(backendStorageAccountName) \
                 --account-key $(STORAGE_ACCOUNT_KEY)
             displayName: 'Create Storage Container for Terraform Backend'

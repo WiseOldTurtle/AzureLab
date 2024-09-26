@@ -12,6 +12,11 @@ resource "azurerm_network_security_group" "frontend_nsg" {
   location            = var.location
   resource_group_name = var.resource_group_name
 
+  # added dependency on the resource group so it does not crash
+  depends_on = [
+    azurerm_resource_group.rg-nsg-wotlab01
+  ]
+
   # Deny all inbound traffic except VNET internal traffic
   security_rule {
     name                       = "DenyAllInbound"

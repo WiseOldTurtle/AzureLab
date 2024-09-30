@@ -13,7 +13,8 @@ variables:
   - group: terraform        # Variable group containing Terraform-related variables
   - name: TF_VARS_subscription_id
     value: $(TF_VARS_subscription_id)  # Reference the variable from the Azure DevOps variable group
-    directories: |
+  - name: directories
+    value:
       networking
       security
       policy
@@ -90,16 +91,6 @@ stages:
                 --access-tier Hot 
           #     --public-network-access disabled
             displayName: 'Create Storage Account'
-
-          # # Set Network Rules for Storage Account  
-          # - script: |
-          #     az storage account network-rule add \
-          #       --resource-group $(backendRGName) \
-          #       --account-name $(backendStorageAccountName) \
-          #       --bypass AzureServices \
-          #       --vnet \
-          #       --subnet 
-          #   displayName: 'Configure Network Rules for Storage Account'
 
           # Retrieve Storage Account Key for container creation
           - script: |

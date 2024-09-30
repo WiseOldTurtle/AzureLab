@@ -125,26 +125,35 @@ stages:
           - task: CmdLine@2
             displayName: 'Terraform Init and Plan for Directories'
             inputs:
-              script: |
-                # Convert the multi-line variable to an array
-                IFS=$'\n' read -r -d '' -a dirs <<< "$(directories)"
-          
-                for dir in "${dirs[@]}"; do
-                  echo "Processing directory: $dir"
-                  cd $(System.DefaultWorkingDirectory)/terraform/$dir
-            
-                  # Terraform Init
-                  terraform init
-            
-                  # Terraform Plan
-                  terraform plan -out=tfplan
-            
-                  # Save Terraform Plan as JSON
-                  terraform show -json tfplan > tfplan.json
-            
-                  # Copy the Terraform Plan JSON to the artifacts directory
-                  cp tfplan.json terraform-artifacts/${dir}_tfplan.json
-                done
+              - script: |
+                  for dir in $(echo $(directories)); do
+                    echo "Running Terraform Init and Plan in $dir"
+      
+                    # Navigate to the respective directory
+                    cd $(System.DefaultWorkingDirectory)/terraform/$dir
+      
+                    # Run Terraform init and pass the Azure DevOps variables
+                    terraform init \
+                    -var "storage_account_name=$(backendStorageAccountName)" \
+                    -var "container_name=$(TF_VAR_ContainerName)" \
+                    -var "state_file=${dir}.tfstate" \
+                    -var "resource_group_name=$(TF_VAR_RGName)"
+      
+                    # Run Terraform plan and save the output as a plan file
+                    terraform plan -out=${dir}.plan
+
+                    # Return to the original directory
+                    cd -
+                  done
+                displayName: 'Run Terraform Init and Plan for all Directories'
+
+            # Publish plans as artifacts
+              - script: |
+                  for dir in $(echo $(directories)); do
+                    echo "Publishing plan for $dir"
+                    echo "##vso[artifact.upload artifactname=${dir}-plan]/terraform/$dir/${dir}.plan"
+                  done
+                displayName: 'Publish Terraform Plans as Artifacts'
 
           # Step 3: Publish all Terraform Plans as a Build Artifact
           - task: PublishBuildArtifacts@1

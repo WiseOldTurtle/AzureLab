@@ -118,26 +118,32 @@ stages:
         steps:
           # Initialize Terraform for each of the directories and run TF Plan
           - script: |
+              # Create a temporary directory to store Terraform plans
+              tempDir="$(Pipeline.Workspace)/tf_plans"
+              mkdir -p $tempDir
+    
               for dir in $(directories); do
                 echo "Running Terraform Init and Plan in $dir"
       
-                # Create a temporary directory for the plan file
-                tempDir="$(Pipeline.Workspace)/tf_plans_$(date:yyyyMMdd)"
-                mkdir -p $tempDir
-      
                 # Navigate to the respective directory
-                cd terraform/$dir
-
+                cd $(System.DefaultWorkingDirectory)/terraform/$dir
+      
                 # Run Terraform init
                 terraform init
       
                 # Run Terraform plan and save the output as a plan file in the temp directory
                 terraform plan -out=$tempDir/${dir}.plan
       
-                # Publish the plan directly as an artifact
-                echo "##vso[artifact.upload artifactname=${dir}-plan]$tempDir/${dir}.plan"
-      
                 # Return to the original directory
                 cd -
               done
             displayName: 'Run Terraform Init and Plan for all Directories'
+
+          # Publish Terraform plans as build artifacts
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Terraform Plans as Build Artifacts'
+            inputs:
+              PathtoPublish: '$(Pipeline.Workspace)/tf_plans'  # Path to the temp directory
+              ArtifactName: 'TerraformPlans'  # Name of the artifact
+              publishLocation: 'Container'  # Upload to the pipeline's artifact container
+

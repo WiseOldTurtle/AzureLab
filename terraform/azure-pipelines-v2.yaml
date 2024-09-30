@@ -118,40 +118,26 @@ stages:
         steps:
           # Initialize Terraform for each of the directories and run TF Plan
           - script: |
-              for dir in $(echo $(directories)); do
+              for dir in $(directories); do
                 echo "Running Terraform Init and Plan in $dir"
       
-                # Navigate to the directories
+                # Create a temporary directory for the plan file
+                tempDir="$(Pipeline.Workspace)/tf_plans_$(date:yyyyMMdd)"
+                mkdir -p $tempDir
+      
+                # Navigate to the respective directory
                 cd terraform/$dir
-      
-                # Run Terraform init and pass ADO variables
-                terraform init \
-                -var "storage_account_name=$(backendStorageAccountName)" \
-                -var "container_name=$(backendContainerName)" \
-                -var "state_file=${dir}.tfstate" \
-                -var "resource_group_name=$(backendRGName)"
-      
-                # Run Terraform plan and save the output as a plan file
-                terraform plan -out=${dir}.plan
 
+                # Run Terraform init
+                terraform init
+      
+                # Run Terraform plan and save the output as a plan file in the temp directory
+                terraform plan -out=$tempDir/${dir}.plan
+      
+                # Publish the plan directly as an artifact
+                echo "##vso[artifact.upload artifactname=${dir}-plan]$tempDir/${dir}.plan"
+      
                 # Return to the original directory
                 cd -
               done
             displayName: 'Run Terraform Init and Plan for all Directories'
-
-          # Create a directory to store plans temporarily
-          - script: |
-              mkdir -p $(Build.ArtifactStagingDirectory)/plans
-              for dir in $(directories); do
-                echo "Moving plan for $dir to staging directory"
-                mv terraform/$dir/${dir}.plan $(Build.ArtifactStagingDirectory)/plans/${dir}.plan
-              done
-            displayName: 'Move Plans to Staging Directory'
-
-            # Publish plans as artifacts
-          - task: PublishBuildArtifacts@1
-            inputs:
-              pathToPublish: '$(Build.ArtifactStagingDirectory)/plans'
-              artifactName: 'terraform-plans'
-              publishLocation: 'Container'
-            displayName: 'Publish Terraform Plans as Artifacts'

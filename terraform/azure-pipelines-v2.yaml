@@ -77,14 +77,14 @@ stages:
 
           # Resource Group Creation
           - script: |
-              az group create --name $(backendRGName) --location "UK South"
+              az group create --name $(TF_VAR_RGName) --location "UK South"
             displayName: 'Create Resource Group'
 
           # Create Storage Account with Private Access
           - script: |
               az storage account create \
-                --name $(backendStorageAccountName) \
-                --resource-group $(backendRGName) \
+                --name $(TF_VAR_StorageAccountName) \
+                --resource-group $(TF_VAR_RGName) \
                 --location "UK South" \
                 --sku Standard_LRS \
                 --kind StorageV2 \
@@ -95,8 +95,8 @@ stages:
           # Retrieve Storage Account Key for container creation
           - script: |
               STORAGE_ACCOUNT_KEY=$(az storage account keys list \
-                --resource-group $(backendRGName) \
-                --account-name $(backendStorageAccountName) \
+                --resource-group $(TF_VAR_RGName) \
+                --account-name $(TF_VAR_StorageAccountName) \
                 --query '[0].value' \
                 --output tsv)
               echo "##vso[task.setvariable variable=STORAGE_ACCOUNT_KEY]$STORAGE_ACCOUNT_KEY"
@@ -105,8 +105,8 @@ stages:
           # Create Storage Container using the retrieved key
           - script: |
               az storage container create \
-                --name $(backendContainerName) \
-                --account-name $(backendStorageAccountName) \
+                --name $(TF_VAR_ContainerName) \
+                --account-name $(TF_VAR_StorageAccountName) \
                 --account-key $(STORAGE_ACCOUNT_KEY)
             displayName: 'Create Storage Container for Terraform Backend'
 
@@ -116,34 +116,41 @@ stages:
       - job: TerraformTasks
         displayName: 'Terraform Init and Plan'
         steps:
-          # Initialize Terraform for each of the directories and run TF Plan
+          # Step 1: Create a directory to store the artifacts
           - script: |
-              # Create a temporary directory to store Terraform plans
-              tempDir="$(Pipeline.Workspace)/tf_plans"
-              mkdir -p $tempDir
-    
-              for dir in $(directories); do
-                echo "Running Terraform Init and Plan in $dir"
-      
-                # Navigate to the respective directory
-                cd $(System.DefaultWorkingDirectory)/terraform/$dir
-      
-                # Run Terraform init
-                terraform init
-      
-                # Run Terraform plan and save the output as a plan file in the temp directory
-                terraform plan -out=$tempDir/${dir}.plan
-      
-                # Return to the original directory
-                cd -
-              done
-            displayName: 'Run Terraform Init and Plan for all Directories'
+              mkdir -p terraform-artifacts
+            displayName: 'Create Artifacts Directory'
 
-          # Publish Terraform plans as build artifacts
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Terraform Plans as Build Artifacts'
+          # Step 2: Loop through directories
+          - task: CmdLine@2
+            displayName: 'Terraform Init and Plan for Directories'
             inputs:
-              PathtoPublish: '$(Pipeline.Workspace)/tf_plans'  # Path to the temp directory
-              ArtifactName: 'TerraformPlans'  # Name of the artifact
-              publishLocation: 'Container'  # Upload to the pipeline's artifact container
+              script: |
+                # Convert the multi-line variable to an array
+                IFS=$'\n' read -r -d '' -a dirs <<< "$(directories)"
+          
+                for dir in "${dirs[@]}"; do
+                  echo "Processing directory: $dir"
+                  cd $(System.DefaultWorkingDirectory)/terraform/$dir
+            
+                  # Terraform Init
+                  terraform init
+            
+                  # Terraform Plan
+                  terraform plan -out=tfplan
+            
+                  # Save Terraform Plan as JSON
+                  terraform show -json tfplan > tfplan.json
+            
+                  # Copy the Terraform Plan JSON to the artifacts directory
+                  cp tfplan.json terraform-artifacts/${dir}_tfplan.json
+                done
+
+          # Step 3: Publish all Terraform Plans as a Build Artifact
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Terraform Plans as a build artifact'
+            inputs:
+              PathtoPublish: 'terraform-artifacts'
+              ArtifactName: 'TerraformPlans'
+              publishLocation: 'Container'
 

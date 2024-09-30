@@ -139,10 +139,19 @@ stages:
               done
             displayName: 'Run Terraform Init and Plan for all Directories'
 
-          # Publish plans as artifacts
+          # Create a directory to store plans temporarily
           - script: |
-              for dir in $(echo $(directories)); do
-                echo "Publishing plan for $dir"
-                echo "##vso[artifact.upload artifactname=${dir}-plan]$(System.DefaultWorkingDirectory)/terraform/$dir/${dir}.plan"
+              mkdir -p $(Build.ArtifactStagingDirectory)/plans
+              for dir in $(directories); do
+                echo "Moving plan for $dir to staging directory"
+                mv terraform/$dir/${dir}.plan $(Build.ArtifactStagingDirectory)/plans/${dir}.plan
               done
+            displayName: 'Move Plans to Staging Directory'
+
+            # Publish plans as artifacts
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: '$(Build.ArtifactStagingDirectory)/plans'
+              artifactName: 'terraform-plans'
+              publishLocation: 'Container'
             displayName: 'Publish Terraform Plans as Artifacts'

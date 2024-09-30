@@ -1,5 +1,7 @@
 # *Azure Landing Zone Project: Terraform, Azure DevOps, Security*
 
+**Main Goal**
+
 **Key Tasks and Points:**
 - **DONE** Aim to see if I can get some smart logic added into Terraform templates using local variables to create loops for repetitive areas such as Vnets and Subnets.
 -- *Added in some logic using a ForEach and a Count to iterate VNets and Subnets*
@@ -8,31 +10,42 @@
 - Add in some sort of testing to the pipeline, through the use of trivy or terratest. Trivy sample is below (got it to work in early code):
 
 ``` YAML
-- task: CmdLine@2
-      displayName: 'Download and Install Trivy vulnerability scanner'
-      inputs:
-        script: |
-          sudo apt-get install rpm
-           wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.deb
-          sudo dpkg -i trivy_0.20.0_Linux-64bit.deb
-          trivy -v
+        - task: CmdLine@2
+          displayName: 'Download and Install Trivy vulnerability scanner'
+          inputs:
+            script: |
+              sudo apt-get update
+              sudo apt-get install rpm -y
+              wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.deb
+              sudo dpkg -i trivy_0.20.0_Linux-64bit.deb
+              trivy -v
 
-    - task: CmdLine@2
-      displayName: 'LOW/MED - Trivy vulnerability scanner in IaC mode'
-      inputs:
-        script: |
-          for file in $(find /home/vsts/work/1/src -name "*.tf"); do
-              trivy config --severity LOW,MEDIUM --exit-code 0 "$file"
-          done
+          # Run Trivy for LOW and MEDIUM severity issues (scans all .tf files within / terraform)
+        - task: CmdLine@2
+          displayName: 'LOW/MED - Trivy vulnerability scanner in IaC mode for Terraform files'
+          inputs:
+            script: |
+              mkdir -p trivy-reports  # Create a directory to store scan results
+              for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
+              trivy config --severity LOW,MEDIUM --exit-code 0 --format json --output trivy-reports/$(basename $file)_lowmed.json "$file"
+              done
 
+          # Run Trivy for HIGH and CRITICAL severity issues (scans all .tf files within / terraform)
+        - task: CmdLine@2
+          displayName: 'HIGH/CRIT - Trivy vulnerability scanner in IaC mode for Terraform files'
+          inputs:
+            script: |
+              for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
+              trivy config --severity HIGH,CRITICAL --exit-code 0 --format json --output trivy-reports/$(basename $file)_highcrit.json "$file"
+              done
 
-    - task: CmdLine@2
-      displayName: 'HIGH/CRIT - Trivy vulnerability scanner in IaC mode'
-      inputs:
-        script: |
-          for file in $(find /home/vsts/work/1/src -name "*.tf"); do
-              trivy config --severity HIGH,CRITICAL --exit-code 0 "$file"
-          done
+          # Publish Trivy Scan Results as a Build Artifact
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Trivy scan results as a build artifact'
+          inputs:
+            PathtoPublish: 'trivy-reports'
+            ArtifactName: 'TrivyScanResults'
+            publishLocation: 'Container'
 ```
 
 ## **Architecture:** 

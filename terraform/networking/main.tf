@@ -2,18 +2,6 @@
     features {}
   }
 
-# input variable mapping the function from Tfvars
-variable "vnetloop" {
-  type = list(object({
-    vnet_name     = string
-    address_space = list(string)
-    subnets = list(object({
-      name    = string
-      address = string
-    }))
-  }))
-}
-
 resource "azurerm_resource_group" "networking" {
   name     = var.resource_group_name
   location = var.location

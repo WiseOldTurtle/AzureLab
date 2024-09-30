@@ -24,3 +24,15 @@ variable "state_file" {
   description = "The name of the state file."
   type        = string
 }
+
+# input variable mapping the function from Tfvars
+variable "vnetloop" {
+  type = list(object({
+    vnet_name     = string
+    address_space = list(string)
+    subnets = list(object({
+      name    = string
+      address = string
+    }))
+  }))
+}

@@ -13,7 +13,8 @@ variables:
   - group: terraform        # Variable group containing Terraform-related variables
   - name: TF_VARS_subscription_id
     value: $(TF_VARS_subscription_id)  # Reference the variable from the Azure DevOps variable group
-    directories: |
+  - name: directories
+    value:
       networking
       security
       policy
@@ -91,16 +92,6 @@ stages:
           #     --public-network-access disabled
             displayName: 'Create Storage Account'
 
-          # # Set Network Rules for Storage Account  
-          # - script: |
-          #     az storage account network-rule add \
-          #       --resource-group $(backendRGName) \
-          #       --account-name $(backendStorageAccountName) \
-          #       --bypass AzureServices \
-          #       --vnet \
-          #       --subnet 
-          #   displayName: 'Configure Network Rules for Storage Account'
-
           # Retrieve Storage Account Key for container creation
           - script: |
               STORAGE_ACCOUNT_KEY=$(az storage account keys list \
@@ -127,31 +118,26 @@ stages:
         steps:
           # Initialize Terraform for each of the directories and run TF Plan
           - script: |
-              for dir in $(echo $(directories)); do
+              for dir in $(directories); do
                 echo "Running Terraform Init and Plan in $dir"
       
-                # Navigate to the directories
+                # Create a temporary directory for the plan file
+                tempDir="$(Pipeline.Workspace)/tf_plans_$(date:yyyyMMdd)"
+                mkdir -p $tempDir
+      
+                # Navigate to the respective directory
                 cd terraform/$dir
-      
-                # Run Terraform init and pass ADO variables
-                terraform init \
-                -var "storage_account_name=$(backendStorageAccountName)" \
-                -var "container_name=$(backendContainerName)" \
-                -var "state_file=${dir}.tfstate" \
-                -var "resource_group_name=$(backendRGName)"
-      
-                # Run Terraform plan and save the output as a plan file
-                terraform plan -out=${dir}.plan
 
+                # Run Terraform init
+                terraform init
+      
+                # Run Terraform plan and save the output as a plan file in the temp directory
+                terraform plan -out=$tempDir/${dir}.plan
+      
+                # Publish the plan directly as an artifact
+                echo "##vso[artifact.upload artifactname=${dir}-plan]$tempDir/${dir}.plan"
+      
                 # Return to the original directory
                 cd -
               done
             displayName: 'Run Terraform Init and Plan for all Directories'
-
-          # Publish plans as artifacts
-          - script: |
-              for dir in $(echo $(directories)); do
-                echo "Publishing plan for $dir"
-                echo "##vso[artifact.upload artifactname=${dir}-plan]$(System.DefaultWorkingDirectory)/terraform/$dir/${dir}.plan"
-              done
-            displayName: 'Publish Terraform Plans as Artifacts'

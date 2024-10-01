@@ -1,9 +1,6 @@
 name: $(BuildDefinitionName)_$(date:yyyyMMdd)$(rev:.r)
 
 trigger: none
-  # branches:
-  #   include:
-  #     - master
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -23,55 +20,56 @@ stages:
       - job: RunTrivy
         steps:
           # Download and Install Trivy
-        - task: CmdLine@2
-          displayName: 'Download and Install Trivy vulnerability scanner'
-          inputs:
-            script: |
-              sudo apt-get update
-              sudo apt-get install rpm -y
-              wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.deb
-              sudo dpkg -i trivy_0.20.0_Linux-64bit.deb
-              trivy -v
+          - task: CmdLine@2
+            displayName: 'Download and Install Trivy vulnerability scanner'
+            inputs:
+              script: |
+                sudo apt-get update
+                sudo apt-get install rpm -y
+                wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.deb
+                sudo dpkg -i trivy_0.20.0_Linux-64bit.deb
+                trivy -v
 
           # Run Trivy for LOW and MEDIUM severity issues (scans all .tf files within /terraform)
-        - task: CmdLine@2
-          displayName: 'LOW/MED - Trivy vulnerability scanner in IaC mode for Terraform files'
-          inputs:
-            script: |
-              mkdir -p trivy-reports  # Create a directory to store scan results
-              for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
-              trivy config --severity LOW,MEDIUM --exit-code 0 --format json --output trivy-reports/$(basename $file)_lowmed.json "$file"
-              done
+          - task: CmdLine@2
+            displayName: 'LOW/MED - Trivy vulnerability scanner in IaC mode for Terraform files'
+            inputs:
+              script: |
+                mkdir -p trivy-reports  # Create a directory to store scan results
+                for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
+                trivy config --severity LOW,MEDIUM --exit-code 0 --format json --output trivy-reports/$(basename $file)_lowmed.json "$file"
+                done
 
           # Run Trivy for HIGH and CRITICAL severity issues (scans all .tf files within /terraform)
-        - task: CmdLine@2
-          displayName: 'HIGH/CRIT - Trivy vulnerability scanner in IaC mode for Terraform files'
-          inputs:
-            script: |
-              for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
-              trivy config --severity HIGH,CRITICAL --exit-code 0 --format json --output trivy-reports/$(basename $file)_highcrit.json "$file"
-              done
+          - task: CmdLine@2
+            displayName: 'HIGH/CRIT - Trivy vulnerability scanner in IaC mode for Terraform files'
+            inputs:
+              script: |
+                for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
+                trivy config --severity HIGH,CRITICAL --exit-code 0 --format json --output trivy-reports/$(basename $file)_highcrit.json "$file"
+                done
 
           # Publish Trivy Scan Results as a Build Artifact
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Trivy scan results as a build artifact'
-          inputs:
-            PathtoPublish: 'trivy-reports'
-            ArtifactName: 'TrivyScanResults'
-            publishLocation: 'Container'
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Trivy scan results as a build artifact'
+            inputs:
+              PathtoPublish: 'trivy-reports'
+              ArtifactName: 'TrivyScanResults'
+              publishLocation: 'Container'
 
   - stage: SetupCore
     jobs:
       - job: CreateBackendResources
         displayName: 'Create Backend Resources & Export Plan'
         steps:
-          # Azure CLI Login using Service Principal
+          # Set environment variables for Service Principal authentication
           - script: |
-              az login --service-principal \
-                --username $(TF_VAR_client_id) \
-                --password $(TF_VAR_client_secret) \
-                --tenant $(TF_VAR_tenant_id)
-            displayName: 'Azure Login with SP'
+              echo "Setting up Azure Service Principal environment variables"
+              export ARM_CLIENT_ID=$(TF_VAR_client_id)
+              export ARM_CLIENT_SECRET=$(TF_VAR_client_secret)
+              export ARM_SUBSCRIPTION_ID=$(TF_VAR_subscription_id)
+              export ARM_TENANT_ID=$(TF_VAR_tenant_id)
+            displayName: 'Set Azure Service Principal Environment Variables'
 
           # Resource Group Creation
           - script: |
@@ -108,12 +106,12 @@ stages:
                 --account-key $(STORAGE_ACCOUNT_KEY)
             displayName: 'Create Storage Container for Terraform Backend'
 
-        # Step 1: Create a directory to store the artifacts
+          # Step 1: Create a directory to store the artifacts
           - script: |
               mkdir -p terraform-plans
             displayName: 'Create Artifacts Directory'
 
-          # Step 2: Loop through directories
+          # Step 2: Loop through directories and run terraform init/plan
           - script: |
               for dir in $(echo $(directories)); do
                 echo "Running Terraform Init and Plan in $dir"
@@ -121,7 +119,7 @@ stages:
                 # Navigate to the respective directory
                 cd $(System.DefaultWorkingDirectory)/terraform/$dir
       
-                # Run Terraform init and pass the Azure DevOps variables
+                # Run Terraform init and pass the Azure DevOps variables for backend config
                 terraform init \
                 -backend-config="storage_account_name=$(TF_VAR_StorageAccountName)" \
                 -backend-config="container_name=$(TF_VAR_ContainerName)" \
@@ -143,4 +141,3 @@ stages:
               PathtoPublish: 'terraform-plans'
               ArtifactName: 'TerraformPlans'
               publishLocation: 'Container'
-

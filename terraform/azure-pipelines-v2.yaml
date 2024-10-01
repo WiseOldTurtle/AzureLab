@@ -122,8 +122,6 @@ stages:
             displayName: 'Create Artifacts Directory'
 
           # Step 2: Loop through directories
-
-            
           - script: |
               for dir in $(echo $(directories)); do
                 echo "Running Terraform Init and Plan in $dir"
@@ -133,7 +131,7 @@ stages:
       
                 # Run Terraform init and pass the Azure DevOps variables
                 terraform init \
-                -var "storage_account_name=$(backendStorageAccountName)" \
+                -var "storage_account_name=$(TF_VAR_StorageAccountName)" \
                 -var "container_name=$(TF_VAR_ContainerName)" \
                 -var "state_file=${dir}.tfstate" \
                 -var "resource_group_name=$(TF_VAR_RGName)"
@@ -150,15 +148,15 @@ stages:
           - script: |
               for dir in $(echo $(directories)); do
                 echo "Publishing plan for $dir"
-                echo "##vso[artifact.upload artifactname=${dir}-plan]/terraform/$dir/${dir}.plan"
+                echo "##vso[artifact.upload artifactname=${dir}-plan]${dir}.plan"
               done
             displayName: 'Publish Terraform Plans as Artifacts'
 
           # Step 3: Publish all Terraform Plans as a Build Artifact
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Terraform Plans as a build artifact'
-            inputs:
-              PathtoPublish: 'terraform-artifacts'
-              ArtifactName: 'TerraformPlans'
-              publishLocation: 'Container'
+          # - task: PublishBuildArtifacts@1
+          #   displayName: 'Publish Terraform Plans as a build artifact'
+          #   inputs:
+          #     PathtoPublish: 'terraform-artifacts'
+          #     ArtifactName: 'TerraformPlans'
+          #     publishLocation: 'Container'
 

@@ -11,8 +11,6 @@ pool:
 variables:
   - group: WiseOldTurtleSP  # Variable group containing SP details
   - group: terraform        # Variable group containing Terraform-related variables
-  - name: TF_VARS_subscription_id
-    value: $(TF_VARS_subscription_id)  # Reference the variable from the Azure DevOps variable group
   - name: directories
     value:
       networking
@@ -134,9 +132,9 @@ stages:
       
                 # Run Terraform init and pass the Azure DevOps variables
                 terraform init \
-                -backend-config="resource_group_name=$(TF_VAR_RGName)" \
+                -backend-config="storage_account_name=$(TF_VAR_StorageAccountName)" \
                 -backend-config="container_name=$(TF_VAR_ContainerName)" \
-                -backend-config="state_file=${dir}.tfstate" \
+                -backend-config="key=${dir}.tfstate" \
                 -backend-config="resource_group_name=$(TF_VAR_RGName)"
       
                 # Run Terraform plan and save the output as a plan file

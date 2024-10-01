@@ -116,14 +116,11 @@ stages:
         steps:
           # Step 1: Create a directory to store the artifacts
           - script: |
-              mkdir -p terraform-artifacts
+              mkdir -p terraform-plans
             displayName: 'Create Artifacts Directory'
 
           # Step 2: Loop through directories
           - script: |
-              # Create a local directory to store the plan files
-              mkdir -p terraform-plans
-
               for dir in $(echo $(directories)); do
                 echo "Running Terraform Init and Plan in $dir"
       

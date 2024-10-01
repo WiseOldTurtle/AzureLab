@@ -60,10 +60,10 @@ stages:
             ArtifactName: 'TrivyScanResults'
             publishLocation: 'Container'
 
-  - stage: SetupBackend
+  - stage: SetupCore
     jobs:
       - job: CreateBackendResources
-        displayName: 'Create Backend Resources'
+        displayName: 'Create Backend Resources & Export Plan'
         steps:
           # Azure CLI Login using Service Principal
           - script: |
@@ -108,13 +108,7 @@ stages:
                 --account-key $(STORAGE_ACCOUNT_KEY)
             displayName: 'Create Storage Container for Terraform Backend'
 
-
-  - stage: DeployCoreResources
-    jobs:
-      - job: TerraformTasks
-        displayName: 'Terraform Init and Plan'
-        steps:
-          # Step 1: Create a directory to store the artifacts
+        # Step 1: Create a directory to store the artifacts
           - script: |
               mkdir -p terraform-plans
             displayName: 'Create Artifacts Directory'

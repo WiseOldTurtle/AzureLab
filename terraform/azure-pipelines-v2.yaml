@@ -70,7 +70,15 @@ stages:
               export ARM_SUBSCRIPTION_ID=$(TF_VAR_subscription_id)
               export ARM_TENANT_ID=$(TF_VAR_tenant_id)
             displayName: 'Set Azure Service Principal Environment Variables'
-
+          
+          # Step 1: Authenticate Azure CLI using Service Principal
+          - script: |
+              az login --service-principal \
+                --username $(TF_VAR_client_id) \
+                --password $(TF_VAR_client_secret) \
+                --tenant $(TF_VAR_tenant_id)
+            displayName: 'Azure Login with SP'
+          
           # Resource Group Creation
           - script: |
               az group create --name $(TF_VAR_RGName) --location "UK South"

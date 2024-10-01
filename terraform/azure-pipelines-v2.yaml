@@ -134,11 +134,10 @@ stages:
       
                 # Run Terraform init and pass the Azure DevOps variables
                 terraform init \
-                -backend-config=backend.conf \
-                -var "storage_account_name=$(TF_VAR_StorageAccountName)" \
-                -var "container_name=$(TF_VAR_ContainerName)" \
-                -var "state_file=${dir}.tfstate" \
-                -var "resource_group_name=$(TF_VAR_RGName)"
+                -backend-config="resource_group_name=$(TF_VAR_RGName)" \
+                -backend-config="container_name=$(TF_VAR_ContainerName)" \
+                -backend-config="state_file=${dir}.tfstate" \
+                -backend-config="resource_group_name=$(TF_VAR_RGName)"
       
                 # Run Terraform plan and save the output as a plan file
                 terraform plan -out=../../terraform-plans/${dir}.plan

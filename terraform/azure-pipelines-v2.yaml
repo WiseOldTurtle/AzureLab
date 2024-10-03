@@ -90,12 +90,9 @@ stages:
 
           # Step 4: Retrieve Storage Account Key for container creation
           - script: |
-              STORAGE_ACCOUNT_KEY=$(az storage account keys list \
-                --resource-group $(TF_VAR_RGName) \
-                --account-name $(TF_VAR_StorageAccountName) \
-                --query '[0].value' \
-                --output tsv)
-              echo "##vso[task.setvariable variable=STORAGE_ACCOUNT_KEY]$STORAGE_ACCOUNT_KEY"
+              ACCOUNT_KEY=$(az storage account keys list --resource-group $(TF_VAR_RGName) \
+              --account-name $(TF_VAR_StorageAccountName) --query '[0].value' -o tsv) \
+              export ARM_ACCESS_KEY=$ACCOUNT_KEY
             displayName: 'Retrieve Storage Account Key'
 
           # Step 5: Create Storage Container using the retrieved key
@@ -132,11 +129,7 @@ stages:
                 cd $(System.DefaultWorkingDirectory)/terraform/$dir
       
                 # Run Terraform init and pass the Azure DevOps variables for backend config
-                terraform init \
-                -backend-config="storage_account_name=$(TF_VAR_StorageAccountName)" \
-                -backend-config="container_name=$(TF_VAR_ContainerName)" \
-                -backend-config="key=${dir}.tfstate" \
-                -backend-config="resource_group_name=$(TF_VAR_RGName)"
+                terraform init
       
                 # Run Terraform plan and save the output as a plan file
                 terraform plan -out=../../terraform-plans/${dir}.plan

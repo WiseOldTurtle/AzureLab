@@ -2,9 +2,19 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+      version = "~>3.0"
     }
   }
+  backend "azurerm" {
+      resource_group_name  = "tfstate"
+      storage_account_name = "terraformstateprojwot1"
+      container_name       = "tfstate"
+      key                  = "policy.tfstate"
+  }
+}
+
+provider "azurerm" {
+  features {}
 }
 
 resource "azurerm_resource_group" "rg-policy-wotlab01" {

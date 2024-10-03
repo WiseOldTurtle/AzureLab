@@ -100,7 +100,7 @@ stages:
               az storage container create \
                 --name $(TF_VAR_ContainerName) \
                 --account-name $(TF_VAR_StorageAccountName) \
-                --account-key $(STORAGE_ACCOUNT_KEY)
+                --account-key $(ACCOUNT_KEY)
             displayName: 'Create Storage Container for Terraform Backend'
 
           # Step 6: Create a directory to store the artifacts

@@ -91,10 +91,9 @@ stages:
           # Step 4: Retrieve Storage Account Key for container creation
           - script: |
               ACCOUNT_KEY=$(az storage account keys list --resource-group $(TF_VAR_RGName) \
-              --account-name $(TF_VAR_StorageAccountName) --query '[0].value' -o tsv) \
+              --account-name $(TF_VAR_StorageAccountName) --query '[0].value' -o tsv)
               echo "##vso[task.setvariable variable=ACCOUNT_KEY]$ACCOUNT_KEY"
               export ARM_ACCESS_KEY=$ACCOUNT_KEY
-              
             displayName: 'Retrieve Storage Account Key'
 
           # Step 5: Create Storage Container using the retrieved key

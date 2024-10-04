@@ -20,6 +20,8 @@ variables:
   - group: terraform        # Variable group containing Terraform-related variables
   - name: directories
     value: "networking,security,policy"
+  - name: action
+    value: ${{ parameters.Action }}
 
 stages:
   - stage: RunTesting
@@ -111,7 +113,6 @@ stages:
                 --account-key $(ACCOUNT_KEY)
             displayName: 'Create Storage Container for Terraform Backend'
 
-
   - stage: DeployCoreResources
     condition: ne('${{ parameters.Action }}', 'Destroy')
     jobs:
@@ -151,14 +152,6 @@ stages:
                 command: 'plan'
                 workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
                 environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
-
-          # Publish Terraform Plan results as artifacts
-          - ${{ each dir in split(variables.directories, ',') }}:
-            - task: PublishBuildArtifacts@1
-              displayName: 'Publish Artifact (${{ dir }})'
-              inputs:
-                PathtoPublish: '${{ dir }}'
-                ArtifactName: 'terraform-plan-${{ dir }}'
           
           # Task to publish the plan files as build artifacts in a local container
           - ${{ each dir in split(variables.directories, ',') }}:

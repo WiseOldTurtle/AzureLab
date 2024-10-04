@@ -162,24 +162,24 @@ stages:
     jobs:
       - job: terraform_destroy
         steps:
-        - ${{ each dir in split(variables.directories, ',') }}:
-          - task: TerraformTaskV2@2
-            displayName: 'Terraform Init (${{ dir }})'
-            inputs:
-              provider: 'azurerm'
-              command: 'init'
-              backendServiceArm: 'wiseoldturtle-terraform-sp'
-              backendAzureRmResourceGroupName: $(backendRGName)
-              backendAzureRmStorageAccountName: $(backendStorageAccountName)
-              backendAzureRmContainerName: $(backendContainerName)
-              backendAzureRmKey: '${{ dir }}.tfstate'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+          - ${{ each dir in split(variables.directories, ',') }}:
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Init (${{ dir }})'
+              inputs:
+                provider: 'azurerm'
+                command: 'init'
+                backendServiceArm: 'wiseoldturtle-terraform-sp'
+                backendAzureRmResourceGroupName: $(backendRGName)
+                backendAzureRmStorageAccountName: $(backendStorageAccountName)
+                backendAzureRmContainerName: $(backendContainerName)
+                backendAzureRmKey: '${{ dir }}.tfstate'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
 
-          - task: TerraformTaskV2@2
-            displayName: 'Terraform Destroy (${{ dir }})'
-            condition: and(succeeded(), eq(variables['action'], 'Destroy'))
-            inputs:
-              provider: 'azurerm'
-              command: 'destroy'
-              backendAzureRmKey: '${{ dir }}.tfstate'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Destroy (${{ dir }})'
+              condition: and(succeeded(), eq(variables['action'], 'Destroy'))
+              inputs:
+                provider: 'azurerm'
+                command: 'destroy'
+                backendAzureRmKey: '${{ dir }}.tfstate'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'

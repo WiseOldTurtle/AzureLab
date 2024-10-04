@@ -36,7 +36,7 @@ resource "azurerm_virtual_network" "corenetworks" {
 
     content {
       name              = subnet.value.name
-      address_prefix    = [subnet.value.address]
+      address_prefix    = subnet.value.address
     }
   }
 }

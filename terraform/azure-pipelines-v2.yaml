@@ -149,19 +149,26 @@ stages:
                 environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
             
             - task: TerraformTaskV2@2
-            displayName: 'Terraform Apply (${{ dir }})'
-            condition: and(succeeded(), eq(variables['Action'], 'Apply'))
-            inputs:
-              provider: 'azurerm'
-              command: 'apply'
-              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
-          
+              displayName: 'Terraform Apply (${{ dir }})'
+              condition: and(succeeded(), eq(variables['Action'], 'Apply'))
+              inputs:
+                provider: 'azurerm'
+                command: 'apply'
+                environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+
   - stage: terraform_destroy
-    condition: contains('${{ parameters.Action }}', 'Destroy')
+    condition: eq('${{ parameters.Action }}', 'Destroy')
     jobs:
       - job: terraform_destroy
+        displayName: 'Destroy Resources'
         steps:
+          - task: TerraformInstaller@0
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: 'latest'
+          
+          # Loop through directories
           - ${{ each dir in split(variables.directories, ',') }}:
             - task: TerraformTaskV2@2
               displayName: 'Terraform Init (${{ dir }})'
@@ -177,7 +184,7 @@ stages:
 
             - task: TerraformTaskV2@2
               displayName: 'Terraform Destroy (${{ dir }})'
-              condition: and(succeeded(), eq(variables['action'], 'Destroy'))
+              condition: and(succeeded(), eq(variables['Action'], 'Destroy'))
               inputs:
                 provider: 'azurerm'
                 command: 'destroy'

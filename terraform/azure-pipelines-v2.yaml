@@ -19,10 +19,7 @@ variables:
   - group: WiseOldTurtleSP  # Variable group containing SP details
   - group: terraform        # Variable group containing Terraform-related variables
   - name: directories
-    value:
-      networking
-      security
-      policy
+    value: "networking,security,policy"
 
 stages:
   - stage: RunTesting
@@ -133,7 +130,7 @@ stages:
             displayName: 'Create Artifacts Directory'
 
           # Loop through directories
-          - ${{ each dir in variables.directories }}:
+          - ${{ each dir in split(variables.directories, ',') }}:
             - task: TerraformTaskV2@2
               displayName: 'Terraform Init (${{ dir }})'
               inputs:
@@ -156,7 +153,7 @@ stages:
                 environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
           # Publish Terraform Plan results as artifacts
-          - ${{ each dir in variables.directories }}:
+          - ${{ each dir in split(variables.directories, ',') }}:
             - task: PublishBuildArtifacts@1
               displayName: 'Publish Artifact (${{ dir }})'
               inputs:
@@ -164,7 +161,7 @@ stages:
                 ArtifactName: 'terraform-plan-${{ dir }}'
           
           # Task to publish the plan files as build artifacts in a local container
-          - ${{ each dir in variables.directories }}:
+          - ${{ each dir in split(variables.directories, ',') }}:
             - task: PublishBuildArtifacts@1
               displayName: 'Publish Artifact (${{ dir }})'
               inputs:

@@ -154,8 +154,8 @@ stages:
               inputs:
                 provider: 'azurerm'
                 command: 'apply'
-                environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
                 workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+                environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
   - stage: terraform_destroy
     condition: eq('${{ parameters.Action }}', 'Destroy')
@@ -190,3 +190,4 @@ stages:
                 command: 'destroy'
                 backendAzureRmKey: '${{ dir }}.tfstate'
                 workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+                environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'

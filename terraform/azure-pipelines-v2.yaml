@@ -125,11 +125,6 @@ stages:
             inputs:
               terraformVersion: 'latest'
 
-          # Make folder to store artifacts
-          - script: |
-              mkdir -p terraform-plans
-            displayName: 'Create Artifacts Directory'
-
           # Loop through directories
           - ${{ each dir in split(variables.directories, ',') }}:
             - task: TerraformTaskV2@2
@@ -150,7 +145,6 @@ stages:
               inputs:
                 provider: 'azurerm'
                 command: 'plan'
-                commandOptions: '-out ${{ dir }}.tfplan'
                 workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
                 environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
             

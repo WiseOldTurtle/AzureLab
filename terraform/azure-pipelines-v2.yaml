@@ -150,15 +150,42 @@ stages:
               inputs:
                 provider: 'azurerm'
                 command: 'plan'
-                commandOptions: '-out=terraform-plans/${{ dir }}.tfplan'
+                commandOptions: '-out ${{ dir }}.tfplan'
                 workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
                 environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+            
+            - task: TerraformTaskV2@2
+            displayName: 'Terraform Apply (${{ dir }})'
+            condition: and(succeeded(), eq(variables['Action'], 'Apply'))
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
           
-          # Task to publish the plan files as build artifacts in a local container
-          - ${{ each dir in split(variables.directories, ',') }}:
-            - task: PublishBuildArtifacts@1
-              displayName: 'Publish Artifact (${{ dir }})'
-              inputs:
-                PathtoPublish: 'terraform-plans'
-                ArtifactName: '${{ dir }}.tfplan'
-                publishLocation: 'Container'
+  - stage: terraform_destroy
+    condition: contains('${{ parameters.Action }}', 'Destroy')
+    jobs:
+      - job: terraform_destroy
+        steps:
+        - ${{ each dir in split(variables.directories, ',') }}:
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Init (${{ dir }})'
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'wiseoldturtle-terraform-sp'
+              backendAzureRmResourceGroupName: $(backendRGName)
+              backendAzureRmStorageAccountName: $(backendStorageAccountName)
+              backendAzureRmContainerName: $(backendContainerName)
+              backendAzureRmKey: '${{ dir }}.tfstate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Destroy (${{ dir }})'
+            condition: and(succeeded(), eq(variables['action'], 'Destroy'))
+            inputs:
+              provider: 'azurerm'
+              command: 'destroy'
+              backendAzureRmKey: '${{ dir }}.tfstate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'

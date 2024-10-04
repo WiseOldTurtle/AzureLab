@@ -104,47 +104,60 @@ stages:
                 --account-key $(ACCOUNT_KEY)
             displayName: 'Create Storage Container for Terraform Backend'
 
-          # Step 6: Create a directory to store the artifacts
+
+  - stage: DeployCoreResources
+    condition: ne('${{ parameters.Action }}', 'Destroy')
+    jobs:
+      - job: DeployResources
+        displayName: 'Deploy Core Resources'
+        steps:
+          # Install Terraform
+          - task: TerraformInstaller@0
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: 'latest'
+
+          # Make folder to store artifacts
           - script: |
               mkdir -p terraform-plans
             displayName: 'Create Artifacts Directory'
 
-          # Step 7: Set the Azure Service Principal environment variables for Terraform
-          # These are used by Terraform to authenticate using the Service Principal.
-          - task: Bash@3
-            displayName: 'Set Service Principal for Terraform'
-            inputs:
-              targetType: 'inline'
-              script: |
-                export ARM_CLIENT_ID=$(TF_VAR_client_id)
-                export ARM_CLIENT_SECRET=$(TF_VAR_client_secret)
-                export ARM_SUBSCRIPTION_ID=$(TF_VAR_subscription_id)
-                export ARM_TENANT_ID=$(TF_VAR_tenant_id)
-                export ARM_ACCESS_KEY=$(ACCOUNT_KEY)
+          # Loop through directories
+          - ${{ each dir in variables.directories }}:
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Init (${{ dir }})'
+              inputs:
+                provider: 'azurerm'
+                command: 'init'
+                backendServiceArm: 'wiseoldturtle-terraform-sp'
+                backendAzureRmResourceGroupName: $(backendRGName)
+                backendAzureRmStorageAccountName: $(backendStorageAccountName)
+                backendAzureRmContainerName: $(backendContainerName)
+                backendAzureRmKey: '${{ dir }}.tfstate'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
 
-          # Step 8: Loop through directories and run terraform init/plan
-          - script: |
-              for dir in $(echo $(directories)); do
-                echo "Running Terraform Init and Plan in $dir"
-      
-                # Navigate to the respective directory
-                cd $(System.DefaultWorkingDirectory)/terraform/$dir
-      
-                # Run Terraform init and pass the Azure DevOps variables for backend config
-                terraform init
-      
-                # Run Terraform plan and save the output as a plan file
-                terraform plan -out=../../terraform-plans/${dir}.plan
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Plan (${{ dir }})'
+              condition: and(succeeded(), eq(variables['Action'], 'Plan'))
+              inputs:
+                provider: 'azurerm'
+                command: 'plan'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+                environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
-                # Return to the original directory
-                cd -
-              done
-            displayName: 'Run Terraform Init and Plan for all Directories'
-
+          # Publish Terraform Plan results as artifacts
+          - ${{ each dir in variables.directories }}:
+            - task: PublishBuildArtifacts@1
+              displayName: 'Publish Artifact (${{ dir }})'
+              inputs:
+                PathtoPublish: '${{ dir }}'
+                ArtifactName: 'terraform-plan-${{ dir }}'
+          
           # Task to publish the plan files as build artifacts in a local container
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Terraform Plans as a Build Artifact'
-            inputs:
-              PathtoPublish: 'terraform-plans'
-              ArtifactName: 'TerraformPlans'
-              publishLocation: 'Container'
+          - ${{ each dir in variables.directories }}:
+            - task: PublishBuildArtifacts@1
+              displayName: 'Publish Artifact (${{ dir }})'
+              inputs:
+                PathtoPublish: 'terraform-plans'
+                ArtifactName: 'terraform-plan-${{ dir }}'
+                publishLocation: 'Container'

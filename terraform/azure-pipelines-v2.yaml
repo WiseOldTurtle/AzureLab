@@ -149,7 +149,8 @@ stages:
               condition: and(succeeded(), eq(variables['Action'], 'Plan'))
               inputs:
                 provider: 'azurerm'
-                command: 'plan -out=terraform-plans/${{ dir }}.tfplan'
+                command: 'plan'
+                commandOptions: '-out=terraform-plans/${{ dir }}.tfplan'
                 workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
                 environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
           

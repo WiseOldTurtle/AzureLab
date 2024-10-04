@@ -149,7 +149,7 @@ stages:
               condition: and(succeeded(), eq(variables['Action'], 'Plan'))
               inputs:
                 provider: 'azurerm'
-                command: 'plan'
+                command: 'plan -out=terraform-plans/${{ dir }}.tfplan'
                 workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
                 environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
           
@@ -159,5 +159,5 @@ stages:
               displayName: 'Publish Artifact (${{ dir }})'
               inputs:
                 PathtoPublish: 'terraform-plans'
-                ArtifactName: 'terraform-plan-${{ dir }}'
+                ArtifactName: '${{ dir }}.tfplan'
                 publishLocation: 'Container'

@@ -40,3 +40,22 @@ resource "azurerm_virtual_network" "corenetworks" {
     }
   }
 }
+
+# VNet Peering Logic
+# Count -1 ensures that the count, counts the correct number of VNETs
+resource "azurerm_virtual_network_peering" "vnet_peering" {
+  count = length(var.vnetloop) * (length(var.vnetloop) - 1)
+
+  # Local VNet (peering from) floor command makes sure that each VNet peers with all others apart from itself. 
+  name                = "peering-${azurerm_virtual_network.corenetworks[floor(count.index / (length(var.vnetloop) - 1))].name}-to-${azurerm_virtual_network.corenetworks[count.index % (length(var.vnetloop) - 1)].name}"
+  resource_group_name = azurerm_resource_group.networking.name
+  virtual_network_name = azurerm_virtual_network.corenetworks[floor(count.index / (length(var.vnetloop) - 1))].name
+
+  # Remote VNet (peering to)
+  remote_virtual_network_id = azurerm_virtual_network.corenetworks[count.index % (length(var.vnetloop) - 1)].id
+
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = true
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}

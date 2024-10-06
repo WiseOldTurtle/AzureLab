@@ -71,8 +71,7 @@ stages:
       - job: CreateBackendResources
         displayName: 'Create AZ Storage Account and Container'
         steps:
-          # Step 1: Azure CLI Login using Service Principal
-          # This is specifically for the az CLI commands (resource creation)
+          # Authenticate using SP in AZ CLI
           - script: |
               az login --service-principal \
                 --username $(TF_VAR_client_id) \
@@ -80,12 +79,12 @@ stages:
                 --tenant $(TF_VAR_tenant_id)
             displayName: 'Azure Login with SP for CLI'
 
-          # Step 2: Create Resource Group
+          # Create Resource Group
           - script: |
               az group create --name $(backendRGName) --location "UK South"
             displayName: 'Create Resource Group'
 
-          # Step 3: Create Storage Account with Private Access
+          # Create Storage Account with Private Access
           - script: |
               az storage account create \
                 --name $(backendStorageAccountName) \
@@ -97,7 +96,7 @@ stages:
           #     --public-network-access disabled
             displayName: 'Create Storage Account'
 
-          # Step 4: Retrieve Storage Account Key for container creation
+          # Retrieve Storage Account Key for container creation
           - script: |
               ACCOUNT_KEY=$(az storage account keys list --resource-group $(backendRGName) \
               --account-name $(backendStorageAccountName) --query '[0].value' -o tsv)
@@ -105,7 +104,7 @@ stages:
               export ARM_ACCESS_KEY=$ACCOUNT_KEY
             displayName: 'Retrieve Storage Account Key'
 
-          # Step 5: Create Storage Container using the retrieved key
+          # Create Storage Container using the retrieved key
           - script: |
               az storage container create \
                 --name $(backendContainerName) \

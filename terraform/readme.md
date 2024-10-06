@@ -3,60 +3,29 @@
 **Main Goal**
 
 **Key Tasks and Points:**
+- **DONE** Replace ARM templates and Release Pipeline with Terraform and YAML pipeline for CI/CD 
 - **DONE** Aim to see if I can get some smart logic added into Terraform templates using local variables to create loops for repetitive areas such as Vnets and Subnets.
--- *Added in some logic using a ForEach and a Count to iterate VNets and Subnets*
-- See if I can get the YAML pipeline to pick up the backend.tf so I do not need to declare it in the YAML (to keep the YAML neater)
-- Add a task to destroy resources built to ensure costs are low.
-- Add in some sort of testing to the pipeline, through the use of trivy or terratest. Trivy sample is below (got it to work in early code):
-
-``` YAML
-        - task: CmdLine@2
-          displayName: 'Download and Install Trivy vulnerability scanner'
-          inputs:
-            script: |
-              sudo apt-get update
-              sudo apt-get install rpm -y
-              wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.deb
-              sudo dpkg -i trivy_0.20.0_Linux-64bit.deb
-              trivy -v
-
-          # Run Trivy for LOW and MEDIUM severity issues (scans all .tf files within / terraform)
-        - task: CmdLine@2
-          displayName: 'LOW/MED - Trivy vulnerability scanner in IaC mode for Terraform files'
-          inputs:
-            script: |
-              mkdir -p trivy-reports  # Create a directory to store scan results
-              for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
-              trivy config --severity LOW,MEDIUM --exit-code 0 --format json --output trivy-reports/$(basename $file)_lowmed.json "$file"
-              done
-
-          # Run Trivy for HIGH and CRITICAL severity issues (scans all .tf files within / terraform)
-        - task: CmdLine@2
-          displayName: 'HIGH/CRIT - Trivy vulnerability scanner in IaC mode for Terraform files'
-          inputs:
-            script: |
-              for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
-              trivy config --severity HIGH,CRITICAL --exit-code 0 --format json --output trivy-reports/$(basename $file)_highcrit.json "$file"
-              done
-
-          # Publish Trivy Scan Results as a Build Artifact
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Trivy scan results as a build artifact'
-          inputs:
-            PathtoPublish: 'trivy-reports'
-            ArtifactName: 'TrivyScanResults'
-            publishLocation: 'Container'
-```
+ - *Added in some logic using a ForEach and a Count to iterate VNets and Subnets*
+- **DONE** See if I can get the YAML pipeline to pick up the backend.tf so I do not need to declare it in the YAML (to keep the YAML neater)
+ - *Added in the backend.tf reference within the main.tf for each directory*
+- **DONE** Add a task to destroy resources built to ensure costs are low.
+ - *Added in some logic which enables the use of parameters to the pipeline. (Allows the user to select the either Plan, Apply or Destroy)*
+- **DONE** Shorten the template and make it more useable
+ - *updated template is* **AzureLab\terraform\azure-pipelines-v2.yaml** Made the following changes:
+  - Added in testing in the form of trivy (exports reports as artifact to pipeline run)
+  - realised that the pipeline tasks were repeatable, see original **AzureLab\terraform\azure-pipelines.yaml** so I added in a for each loop to loop through the directories.
+  - Due to the 3 different directories, 3 different state files are created alongside so they need to be referenced.
 
 ## **Architecture:** 
 
+(Need to add drawing here)
 
-Tools:
+**Tools:**
 - app.eraser.io (Designing Landing Zone Architecture)
-- Azure (Cloud Infrastructure)
 - Terraform (Infrastracture As Code)
-- Azure DevOps (CI/CD Pipelines + Git Version Control)
-- Trivy (IAC Misconfiguration Scanning) or Terratest integration (TO DO)
+- Azure (Cloud Infrastructure)
+- Azure DevOps (CI/CD Pipelines + Git)
+- Trivy (IAC Misconfiguration Scanning)
 
 **Through the integration of these tools, I successfully:**
 - Designed an Azure Landing Zone
@@ -65,19 +34,20 @@ Tools:
 - Effectively automated the build process for my Terraform infrastructure using Azure Pipelines
 - Integrated Trivy for insights into misconfigurations in my Terraform IAC code
 - Published the build as an artifact and configured continuous deployment to be triggered by the build artifact and deploy the Terraform infrastructure.
-- Added another stage to my release pipeline to automatically cleanup the resources on approval to optimize resource utilization and minimize costs. (TO DO)
+- Added in parameters so the pipeline can run specific Terraform commands such as Plan, Apply and Destroy. 
 
-## **Terraform Configuration:**
+## **Terraform Structure:**
 ``` BASH
 /terraform
    ├── /networking
    │     ├── main.tf          # VNETs and subnets (private)
    │     ├── variables.tf     # Variables for networking
-   │     ├── outputs.tf       # Outputs from the networking module
+   │     ├── terraform.tfvars # Loop reference for subnet and vnet deployment
+   │     ├── outputs.tf       # Outputs from the networking module (not currently being used)
    ├── /security
    │     ├── main.tf          # NSG rules for traffic control
    │     ├── variables.tf     # Variables for NSGs
-   │     ├── outputs.tf       # Outputs from the security module
+   │     ├── outputs.tf       # Outputs from the security module (not currently being used)
    ├── /policy
    │     ├── main.tf          # Azure policy for restricting public IPs and VM sizes
    ├── backend.tf             # Terraform state storage in Azure Blob Storage
@@ -91,44 +61,95 @@ YAML:
 ``` YAML
 name: $(BuildDefinitionName)_$(date:yyyyMMdd)$(rev:.r)
 
-trigger:
-  branches:
-    include:
-      - master
+trigger: none
 
 pool:
   vmImage: 'ubuntu-latest'
 
+parameters:
+  - name: Action
+    displayName: Action
+    type: string
+    default: 'Plan'
+    values:
+    - Plan
+    - Apply
+    - Destroy
+
 variables:
   - group: WiseOldTurtleSP  # Variable group containing SP details
   - group: terraform        # Variable group containing Terraform-related variables
-  - name: TF_VARS_subscription_id
-    value: $(TF_VARS_subscription_id)  # Reference the variable from the Azure DevOps variable group
+  - name: directories
+    value: "networking,security,policy"
+  - name: action
+    value: ${{ parameters.Action }}
 
 stages:
-  - stage: SetupBackend
+  - stage: RunTesting
+    jobs:
+      - job: RunTrivy
+        steps:
+          # Download and Install Trivy
+          - task: CmdLine@2
+            displayName: 'Download and Install Trivy vulnerability scanner'
+            inputs:
+              script: |
+                sudo apt-get update
+                sudo apt-get install rpm -y
+                wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.deb
+                sudo dpkg -i trivy_0.20.0_Linux-64bit.deb
+                trivy -v
+
+          # Run Trivy for LOW and MEDIUM severity issues (scans all .tf files within /terraform)
+          - task: CmdLine@2
+            displayName: 'LOW/MED - Trivy vulnerability scanner in IaC mode for Terraform files'
+            inputs:
+              script: |
+                mkdir -p trivy-reports  # Create a directory to store scan results
+                for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
+                trivy config --severity LOW,MEDIUM --exit-code 0 --format json --output trivy-reports/$(basename $file)_lowmed.json "$file"
+                done
+
+          # Run Trivy for HIGH and CRITICAL severity issues (scans all .tf files within /terraform)
+          - task: CmdLine@2
+            displayName: 'HIGH/CRIT - Trivy vulnerability scanner in IaC mode for Terraform files'
+            inputs:
+              script: |
+                for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
+                trivy config --severity HIGH,CRITICAL --exit-code 0 --format json --output trivy-reports/$(basename $file)_highcrit.json "$file"
+                done
+
+          # Publish Trivy Scan Results as a Build Artifact
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Trivy scan results as a build artifact'
+            inputs:
+              PathtoPublish: 'trivy-reports'
+              ArtifactName: 'TrivyScanResults'
+              publishLocation: 'Container'
+
+  - stage: SetupCore
     jobs:
       - job: CreateBackendResources
-        displayName: 'Create Backend Resources'
+        displayName: 'Create AZ Storage Account and Container'
         steps:
-          # Step 1: Azure CLI Login using Service Principal
+          # Authenticate using SP in AZ CLI
           - script: |
               az login --service-principal \
                 --username $(TF_VAR_client_id) \
                 --password $(TF_VAR_client_secret) \
                 --tenant $(TF_VAR_tenant_id)
-            displayName: 'Azure Login with SP'
+            displayName: 'Azure Login with SP for CLI'
 
-          # Resource Group Creation
+          # Create Resource Group
           - script: |
-              az group create --name $(backendAzureRmResourceGroupName) --location "UK South"
+              az group create --name $(backendRGName) --location "UK South"
             displayName: 'Create Resource Group'
 
           # Create Storage Account with Private Access
           - script: |
               az storage account create \
-                --name $(backendAzureRmStorageAccountName) \
-                --resource-group $(backendAzureRmResourceGroupName) \
+                --name $(backendStorageAccountName) \
+                --resource-group $(backendRGName) \
                 --location "UK South" \
                 --sku Standard_LRS \
                 --kind StorageV2 \
@@ -136,148 +157,100 @@ stages:
           #     --public-network-access disabled
             displayName: 'Create Storage Account'
 
-          # # Set Network Rules for Storage Account  
-          # - script: |
-          #     az storage account network-rule add \
-          #       --resource-group $(backendAzureRmResourceGroupName) \
-          #       --account-name $(backendAzureRmStorageAccountName) \
-          #       --bypass AzureServices \
-          #       --vnet \
-          #       --subnet 
-          #   displayName: 'Configure Network Rules for Storage Account'
-
           # Retrieve Storage Account Key for container creation
           - script: |
-              STORAGE_ACCOUNT_KEY=$(az storage account keys list \
-                --resource-group $(backendAzureRmResourceGroupName) \
-                --account-name $(backendAzureRmStorageAccountName) \
-                --query '[0].value' \
-                --output tsv)
-              echo "##vso[task.setvariable variable=STORAGE_ACCOUNT_KEY]$STORAGE_ACCOUNT_KEY"
+              ACCOUNT_KEY=$(az storage account keys list --resource-group $(backendRGName) \
+              --account-name $(backendStorageAccountName) --query '[0].value' -o tsv)
+              echo "##vso[task.setvariable variable=ACCOUNT_KEY]$ACCOUNT_KEY"
+              export ARM_ACCESS_KEY=$ACCOUNT_KEY
             displayName: 'Retrieve Storage Account Key'
 
           # Create Storage Container using the retrieved key
           - script: |
               az storage container create \
-                --name tfstate \
-                --account-name $(backendAzureRmStorageAccountName) \
-                --account-key $(STORAGE_ACCOUNT_KEY)
+                --name $(backendContainerName) \
+                --account-name $(backendStorageAccountName) \
+                --account-key $(ACCOUNT_KEY)
             displayName: 'Create Storage Container for Terraform Backend'
 
-
   - stage: DeployCoreResources
+    condition: ne('${{ parameters.Action }}', 'Destroy')
     jobs:
-      - job: DeployNetworking
-        displayName: 'Deploy Networking Resources'
+      - job: DeployResources
+        displayName: 'Deploy Core Resources'
         steps:
-          # Step 5: Initialize Terraform and deploy resources for Networking
+          # Install Terraform
           - task: TerraformInstaller@0
             displayName: 'Install Terraform'
             inputs:
               terraformVersion: 'latest'
 
-          - task: TerraformTaskV2@2
-            displayName: 'Terraform Init (Networking)'
-            inputs:
-              provider: 'azurerm'
-              command: 'init'
-              backendServiceArm: 'wiseoldturtle-terraform-sp'
-              backendAzureRmResourceGroupName: $(backendAzureRmResourceGroupName)
-              backendAzureRmStorageAccountName: $(backendAzureRmStorageAccountName)
-              backendAzureRmContainerName: 'tfstate'
-              backendAzureRmKey: 'networking.tfstate'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
+          # Loop through directories
+          - ${{ each dir in split(variables.directories, ',') }}:
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Init (${{ dir }})'
+              inputs:
+                provider: 'azurerm'
+                command: 'init'
+                backendServiceArm: 'wiseoldturtle-terraform-sp'
+                backendAzureRmResourceGroupName: $(backendRGName)
+                backendAzureRmStorageAccountName: $(backendStorageAccountName)
+                backendAzureRmContainerName: $(backendContainerName)
+                backendAzureRmKey: '${{ dir }}.tfstate'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
 
-          - task: TerraformTaskV2@2
-            displayName: 'Terraform Plan (Networking)'
-            inputs:
-              provider: 'azurerm'
-              command: 'plan'
-         #    commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
-              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Plan (${{ dir }})'
+              condition: and(succeeded(), eq(variables['Action'], 'Plan'))
+              inputs:
+                provider: 'azurerm'
+                command: 'plan'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+                environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+            
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Apply (${{ dir }})'
+              condition: and(succeeded(), eq(variables['Action'], 'Apply'))
+              inputs:
+                provider: 'azurerm'
+                command: 'apply'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+                environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 
-          - task: TerraformTaskV2@2
-            displayName: 'Terraform Apply (Networking)'
-            inputs:
-              provider: 'azurerm'
-              command: 'apply'
-              commandOptions: '-auto-approve'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
-              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
-
-      - job: DeploySecurity
-        displayName: 'Deploy Security Resources'
+  - stage: terraform_destroy
+    condition: eq('${{ parameters.Action }}', 'Destroy')
+    jobs:
+      - job: terraform_destroy
+        displayName: 'Destroy Resources'
         steps:
-          # Step 6: Initialize Terraform and deploy resources for Security
-          - task: TerraformTaskV2@2
-            displayName: 'Terraform Init (Security)'
-            inputs:
-              provider: 'azurerm'
-              command: 'init'
-              backendServiceArm: 'wiseoldturtle-terraform-sp'
-              backendAzureRmResourceGroupName: $(backendAzureRmResourceGroupName)
-              backendAzureRmStorageAccountName: $(backendAzureRmStorageAccountName)
-              backendAzureRmContainerName: 'tfstate'
-              backendAzureRmKey: 'security.tfstate'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
-
-          - task: TerraformTaskV2@2
-            displayName: 'Terraform Plan (Security)'
-            inputs:
-              provider: 'azurerm'
-              command: 'plan'
-          #   commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
-              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
-
-          - task: TerraformTaskV2@2
-            displayName: 'Terraform Apply (Security)'
-            inputs:
-              provider: 'azurerm'
-              command: 'apply'
-              commandOptions: '-auto-approve'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
-              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
-
-      - job: DeployPolicy
-        displayName: 'Deploy Policy Resources'
-        steps:
-          # Initialize Terraform and deploy resources for Policy
           - task: TerraformInstaller@0
             displayName: 'Install Terraform'
             inputs:
               terraformVersion: 'latest'
+          
+          # Loop through directories
+          - ${{ each dir in split(variables.directories, ',') }}:
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Init (${{ dir }})'
+              inputs:
+                provider: 'azurerm'
+                command: 'init'
+                backendServiceArm: 'wiseoldturtle-terraform-sp'
+                backendAzureRmResourceGroupName: $(backendRGName)
+                backendAzureRmStorageAccountName: $(backendStorageAccountName)
+                backendAzureRmContainerName: $(backendContainerName)
+                backendAzureRmKey: '${{ dir }}.tfstate'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
 
-          - task: TerraformTaskV2@2
-            displayName: 'Terraform Init (Policy)'
-            inputs:
-              provider: 'azurerm'
-              command: 'init'
-              backendServiceArm: 'wiseoldturtle-terraform-sp'
-              backendAzureRmResourceGroupName: $(backendAzureRmResourceGroupName)
-              backendAzureRmStorageAccountName: $(backendAzureRmStorageAccountName)
-              backendAzureRmContainerName: 'tfstate'
-              backendAzureRmKey: 'policy.tfstate'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
-
-          - task: TerraformTaskV2@2
-            displayName: 'Terraform Plan (Policy)'
-            inputs:
-              provider: 'azurerm'
-              command: 'plan'
-          #   commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
-              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
-
-          - task: TerraformTaskV2@2
-            displayName: 'Terraform Apply (Policy)'
-            inputs:
-              provider: 'azurerm'
-              command: 'apply'
-              commandOptions: '-auto-approve'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
-              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Destroy (${{ dir }})'
+              condition: and(succeeded(), eq(variables['Action'], 'Destroy'))
+              inputs:
+                provider: 'azurerm'
+                command: 'destroy'
+                backendAzureRmKey: '${{ dir }}.tfstate'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+                environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
 ```
 
 
@@ -285,7 +258,7 @@ stages:
 
 ## **Evaluation:**
 
-I first designed an Azure Landing Zone by creating a diagram on app.eraser.io to plan out my project and have a high level understanding of what i was going to build.
+- My initial landing zone deployment was done via the use of ARM Templates and a release pipeline. I wanted to change it up and show case the use of terraform 
 
 I developed an Azure Landing Zone utilizing Terraform, showcasing my proficiency in cloud architecture and infrastructure as code (IaC). The project aimed to demonstrate my skills and enhance my resume by showcasing my ability to design and deploy Azure resources efficiently.
 

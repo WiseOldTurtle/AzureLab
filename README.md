@@ -1,21 +1,17 @@
-# Introduction 
-This Repo is a collation of matierial I have created and used during my working career. It is still a work in progress, will be udpating regularly. Some of the resources within the repo are:
-- Landing Zone Deployments
-- Useful Powershell Scripts
-- YAML pipeline explanation
-- ARM templates have been broken down to explain resources and any smart logical fuctions used. 
+# Landing Zone Deployment with Terraform and Azure DevOps
 
-# Getting Started
-I have tried to breakdown the structure of the repo to be user friendly (more changes are coming over the next few weeks)
-1.	LZ-ARM: This folder is for building a landing zone using ARM templates. This was initially built as a release pipeline, however, due to CI/CD being on the rise I have remade a portion of it (so far) to install it as a YAML pipeline.
-2.	LZ-Terraform:
-3. 
+This repository showcases my skills in **Terraform** and **Azure DevOps** (ADO) by automating the deployment of an Azure Landing Zone. Initially, this project deployed ARM templates via an ADO release pipeline, but I've enhanced it by transitioning to **Terraform** with a **YAML-based CI/CD pipeline**.
 
+## Key Enhancements
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+- **Terraform Integration:** Replaced ARM templates with **Terraform** files to modernize and simplify the deployment process.
+- **CI/CD with Azure Pipelines:** Introduced a YAML-based pipeline in **Azure DevOps** to automate the entire workflow—plan, apply, and destroy.
+- **Iterative Task Handling:** Incorporated **foreach loops** in the pipeline to iterate against Terraform tasks, making the deployment process smarter and more efficient.
+- **Flexible Terraform Actions:** Added the ability to select specific Terraform operations (plan, apply, destroy) through parameterization, enhancing pipeline flexibility.
+- **Resource-Level Iteration:** Utilized **tfvars** files to manage **virtual networks (vnets)** and **subnets**, improving the organization and scalability of infrastructure deployments.
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+This project reflects my hands-on experience with **Terraform** and showcases my ability to build scalable and automated cloud solutions using **CI/CD pipelines** in ADO. 
+
+Feel free to explore the repo and check out the different stages of deployment!
+
+**Note** *I also have created some useful Azure and Powershell scripts that I have found useful during my time working.*

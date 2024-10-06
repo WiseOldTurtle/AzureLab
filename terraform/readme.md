@@ -33,7 +33,6 @@
 - Stored the terraform state file in a remote backend in an azure blob container
 - Effectively automated the build process for my Terraform infrastructure using Azure Pipelines
 - Integrated Trivy for insights into misconfigurations in my Terraform IAC code
-- Published the build as an artifact and configured continuous deployment to be triggered by the build artifact and deploy the Terraform infrastructure.
 - Added in parameters so the pipeline can run specific Terraform commands such as Plan, Apply and Destroy. 
 
 ## **Terraform Structure:**
@@ -261,24 +260,6 @@ stages:
 - My initial landing zone deployment was done via the use of ARM Templates and a release pipeline. I wanted to change it up and show case the use of terraform 
 
 I developed an Azure Landing Zone utilizing Terraform, showcasing my proficiency in cloud architecture and infrastructure as code (IaC). The project aimed to demonstrate my skills and enhance my resume by showcasing my ability to design and deploy Azure resources efficiently.
-
-The architecture comprised of three resource groups:
-
-Identity: This resource group focused on security, incorporating Azure Security Center, Azure Key Vault, and policy definitions to ensure robust governance and compliance.
-
-Management/Logging: Hosting Log Analytics Workspaces, this group facilitated centralized monitoring and management, enhancing operational efficiency.
-
-Network: Serving as the connectivity backbone, this group included firewall configurations, Virtual Hub, Virtual WAN, DNS configurations, Network Security Groups (NSG) and Application Security Groups (ASG) to ensure secure network communication.
-
-Application: This group housed the essential components for application functionality, including Virtual Network (VNet), Load Balancer for the front-end, Virtual Machine (VM) for the application-end, SQL Server, and SQL Database for the database-end.
-
-To automate my infrastructure deployment and ensure security, I utilized Azure DevOps to create a CI/CD pipeline. The pipeline integrated Terraform for provisioning and Trivy for misconfiguration scanning , streamlining deployment and ensuring adherence to security standards.
-
-I additionally implemented a clean-up stage to facilitate resource destruction upon approval, optimizing resource utilization and minimizing costs.
-
-In conclusion, this project served as a valuable showcase of my skills in cloud architecture, infrastructure automation, and security, demonstrating my proficiency in cloud technologies and DevOps tools.
-
-
 
 
 

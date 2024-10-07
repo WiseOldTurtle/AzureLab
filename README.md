@@ -14,4 +14,4 @@ This project reflects my hands-on experience with **Terraform** and showcases my
 
 Feel free to explore the repo and check out the different stages of deployment!
 
-**Note** *I also have created some useful Azure and Powershell scripts that I have found useful during my time working.*
+**Note** *I also have added in some useful Azure and Powershell scripts that I have either created or used during my time working.*

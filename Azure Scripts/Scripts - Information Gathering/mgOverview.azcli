@@ -1,0 +1,24 @@
+# List all management groups
+echo "Management Groups:"
+az account management-group list --output table
+
+# Loop through each management group to get subscriptions
+for mg in $(az account management-group list --query "[].name" -o tsv)
+do
+    echo "Subscriptions in Management Group: $mg"
+    az account management-group subscription list --name $mg --output table
+
+    # Loop through each subscription in the management group
+    for sub in $(az account management-group subscription list --name $mg --query "[].id" -o tsv)
+    do
+        echo "Resource Groups in Subscription: $sub"
+        az group list --subscription $sub --output table
+
+        # Loop through each resource group to list resources
+        for rg in $(az group list --subscription $sub --query "[].name" -o tsv)
+        do
+            echo "Resources in Resource Group: $rg"
+            az resource list --resource-group $rg --subscription $sub --output table
+        done
+    done
+done

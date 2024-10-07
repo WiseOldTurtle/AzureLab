@@ -1,0 +1,152 @@
+{
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01",
+		"resource_type": "azurerm_resource_group",
+		"resource_name": "res-0"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/networkSecurityGroups/nsg-wot-uks-application01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/networkSecurityGroups/nsg-wot-uks-application01",
+		"resource_type": "azurerm_network_security_group",
+		"resource_name": "res-1"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/networkSecurityGroups/nsg-wot-uks-cgm01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/networkSecurityGroups/nsg-wot-uks-cgm01",
+		"resource_type": "azurerm_network_security_group",
+		"resource_name": "res-2"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/networkSecurityGroups/nsg-wot-uks-database01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/networkSecurityGroups/nsg-wot-uks-database01",
+		"resource_type": "azurerm_network_security_group",
+		"resource_name": "res-3"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/networkSecurityGroups/nsg-wot-uks-jumphosts01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/networkSecurityGroups/nsg-wot-uks-jumphosts01",
+		"resource_type": "azurerm_network_security_group",
+		"resource_name": "res-4"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/networkSecurityGroups/nsg-wot-uks-trusted01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/networkSecurityGroups/nsg-wot-uks-trusted01",
+		"resource_type": "azurerm_network_security_group",
+		"resource_name": "res-5"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/networkSecurityGroups/nsg-wot-uks-webserver01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/networkSecurityGroups/nsg-wot-uks-webserver01",
+		"resource_type": "azurerm_network_security_group",
+		"resource_name": "res-6"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/routeTables/UDRName": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/routeTables/UDRName",
+		"resource_type": "azurerm_route_table",
+		"resource_name": "res-7"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/routeTables/UDRName/routes/udr-wot--uksbackend": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/routeTables/UDRName/routes/udr-wot--uksbackend",
+		"resource_type": "azurerm_route",
+		"resource_name": "res-8"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/routeTables/UDRName/routes/udr-wot--uksfrontend": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/routeTables/UDRName/routes/udr-wot--uksfrontend",
+		"resource_type": "azurerm_route",
+		"resource_name": "res-9"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-core01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-core01",
+		"resource_type": "azurerm_virtual_network",
+		"resource_name": "res-10"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-core01/subnets/sn-wot-uks-activedirectory": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-core01/subnets/sn-wot-uks-activedirectory",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-11"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-core01/subnets/sn-wot-uks-application01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-core01/subnets/sn-wot-uks-application01",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-12"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-core01/subnets/sn-wot-uks-database01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-core01/subnets/sn-wot-uks-database01",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-13"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-core01/subnets/sn-wot-uks-webserver01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-core01/subnets/sn-wot-uks-webserver01",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-14"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-core01/virtualNetworkPeerings/peering-to-remote-vnet": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-core01/virtualNetworkPeerings/peering-to-remote-vnet",
+		"resource_type": "azurerm_virtual_network_peering",
+		"resource_name": "res-15"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-hub01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-hub01",
+		"resource_type": "azurerm_virtual_network",
+		"resource_name": "res-16"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-hub01/subnets/AzureBastionSubnet": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-hub01/subnets/AzureBastionSubnet",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-17"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-hub01/subnets/sn-wot-uks-cloudguardmgmt": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-hub01/subnets/sn-wot-uks-cloudguardmgmt",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-18"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-hub01/subnets/sn-wot-uks-firewall01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-hub01/subnets/sn-wot-uks-firewall01",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-19"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-hub01/subnets/sn-wot-uks-firewall02": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-hub01/subnets/sn-wot-uks-firewall02",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-20"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-hub01/subnets/sn-wot-uks-management01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-hub01/subnets/sn-wot-uks-management01",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-21"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-preprod01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-preprod01",
+		"resource_type": "azurerm_virtual_network",
+		"resource_name": "res-22"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-preprod01/subnets/sn-wot-uks-application01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-preprod01/subnets/sn-wot-uks-application01",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-23"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-preprod01/subnets/sn-wot-uks-database01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-preprod01/subnets/sn-wot-uks-database01",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-24"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-preprod01/subnets/sn-wot-uks-webserver01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-preprod01/subnets/sn-wot-uks-webserver01",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-25"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-prod01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-prod01",
+		"resource_type": "azurerm_virtual_network",
+		"resource_name": "res-26"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-prod01/subnets/sn-wot-uks-application01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-prod01/subnets/sn-wot-uks-application01",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-27"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-prod01/subnets/sn-wot-uks-database01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-prod01/subnets/sn-wot-uks-database01",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-28"
+	},
+	"/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-prod01/subnets/sn-wot-uks-webserver01": {
+		"resource_id": "/subscriptions/d9d2ecd3-56a0-4f15-bae9-04b37c0d4335/resourceGroups/rg-vnet-wotlab01/providers/Microsoft.Network/virtualNetworks/vn-wot-uks-prod01/subnets/sn-wot-uks-webserver01",
+		"resource_type": "azurerm_subnet",
+		"resource_name": "res-29"
+	}
+}

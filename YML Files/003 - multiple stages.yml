@@ -1,0 +1,27 @@
+trigger:
+- none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+# this is an example of multiple stages. as you can see there are 2 stages with 2 jobs per stage. a simple echo command
+stages:
+- stage: A
+  jobs:
+  - job: A1
+    steps:
+    - script: echo "A1"
+
+  - job: A2
+    steps:
+    - script: echo "A2"
+
+- stage: B
+  jobs:
+  - job: B1
+    steps:
+    - script: echo "B1"
+
+  - job: B2
+    steps:
+    - script: echo "B2"

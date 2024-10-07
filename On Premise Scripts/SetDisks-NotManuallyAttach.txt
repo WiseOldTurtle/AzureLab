@@ -1,0 +1,1 @@
+Get-VirtualDisk | Where-Object {$_.IsManualAttach –EQ  $True} | Set-VirtualDisk –IsManualAttach $False

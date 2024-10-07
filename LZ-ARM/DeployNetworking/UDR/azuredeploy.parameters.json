@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "routeTableName": {
+      "value": "wotlab-udr"
+    },
+    "udrRoutes": {
+      "value": [
+        {
+          "name": "frontend",
+          "nextHopType": "VirtualAppliance",
+          "nextHopIpAddress": "1.1.1.10",
+          "addressPrefix": "1.1.1.0/24"
+        },
+        {
+          "name": "backend",
+          "nextHopType": "VirtualAppliance",
+          "nextHopIpAddress": "2.2.2.10",
+          "addressPrefix": "2.2.2.0/24"
+        }
+      ]
+    }
+  }
+}

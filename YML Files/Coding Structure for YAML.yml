@@ -1,0 +1,56 @@
+
+# Objects and their properties are defined by an indent. for example below, I have created the person property and I have properties indented following it. 
+# In contrast to JSON properties to do not require "" '' however you can use them if you prefer
+person:
+  name: Sami Rashid                                 # Standard String Example 
+  age: 50                                           # Integer example
+  occupation : DevOps Engineer                      # Another String
+  male: true                                        # Boolean example
+  birthday: 1900-01-30 12:00:00                     # ISO 8601 is the standard you will use for the date and time 
+  flaws: null                                       # You can also have Null Values
+
+  # You can create a list also known as an array using using a few methods lets see below some examples
+  hobbies:                                          # This is a basic sort of list similar to a bullet point setup (much easier to read than the traditional Array list in JSOn which we will see)
+    - gaming
+    - chilling
+    - learning
+  movies: ["Bad Boys", "Friday" , "Rush Hour"]      # You can also create an array list similar to JSON 
+  
+  friends:                                          # here i will make a list within a value of an object, so essentially a further array of values per object within an object there are 3 ways:
+    - name: "John"                                  
+    - age: 30                                       # the 1st way is simple you add the hyphen and add in values per line as the hobbies
+    - {name: "Smith", age: 30}                      # the 2nd way you use curly brackets {} and quotation marks ""
+    - 
+      name: "James"                                 # the 3rd wqay uoy you leave the inden blank and hit enter then you can add in the values. 
+      age: 30
+
+# this is how to deal with large text files and to format them
+description: >                                                                # the > symbol will ensure the below text is outputted as a single line
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut 
+  aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in 
+  voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+  Excepteur sint occaecat cupidatat non proident.
+
+signature: |                                                                  # the | pipe will ensure the formatting is maintained and presented as you put it.
+  Sami
+  NewSignature
+  email - sami.rashid@newsignature.com
+
+# Within Yaml you can reference variables and objects with 2 symbols the & and * lets see an example below:
+login credentials:
+  Username: User1
+  password: &password NotASecurePassword
+
+userid: User1
+password: *password                         # this will automatically fill in "NotASecurePassword" , If I was to change the &password property then it wall update the *password
+
+# You can also reference key value pairs, this is done:
+
+base: &base                                   # &base is set to create the reference object and its values are var1: value1
+  var1: value1
+
+foo:                                          # lets say foo is another object you have made and now you want to include var1: value1 within it
+  <<: *base                                   # this will automatically fill in var1: value1
+  var2: value2

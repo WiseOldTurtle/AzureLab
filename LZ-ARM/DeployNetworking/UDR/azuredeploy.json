@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "routeTableName": {
+      "type": "string"
+    },
+    "udrRoutes": {
+      "type": "array",
+      "metadata": {
+        "description": "description"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "UK South"
+    }
+  },
+  "variables": {
+    "namingConvention": {
+      "snPrefix": "sn-",
+      "forceID": "wot-",
+      "vnPrefix": "vn-",
+      "nsgPrefix": "nsg-",
+      "region": "-uks",
+      "udrPrefix": "udr-"
+    },
+
+    "UdrPrefix": "[concat(variables('namingConvention').udrPrefix, variables('namingConvention').forceID, variables('namingConvention').region)]"
+  },
+
+  "resources": [
+    {
+      "name": "[parameters('routetableName')]",
+      "type": "Microsoft.Network/routeTables",
+      "apiVersion": "2018-08-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "copy": [
+          {
+            "name": "routes",
+            "count": "[length(parameters('udrRoutes'))]",
+            "input": {
+              "name": "[concat(variables('UdrPrefix'), parameters('udrRoutes')[copyIndex('routes')].name)]",
+              "properties": {
+                "addressPrefix": "[parameters('udrRoutes')[copyIndex('routes')].addressPrefix]",
+                "nextHopType": "[parameters('udrRoutes')[copyIndex('routes')].nextHopType]",
+                "nextHopIpAddress": "[parameters('udrRoutes')[copyIndex('routes')].nextHopIpAddress]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {}
+}

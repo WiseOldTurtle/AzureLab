@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "keyVaultName": {
+        "value": "wiseoldturtle-kv"
+      },
+      "objectId": {
+        "value": "3ca1aa0c-950a-4e8b-b00f-ab3ab0a13d8c"
+      },
+      "secretsPermissions": {
+        "value": [ "get", "list", "set", "delete", "backup", "restore", "recover", "purge" ]
+      },
+      "keysPermissions": {
+        "value": [ "encrypt", "decrypt", "wrapKey", "unwrapKey", "sign", "verify", "get", "list", "create", "update", "import", "delete", "backup", "restore", "recover", "purge"]
+      },
+      "secretName": {
+        "value": "WindowsAdminPassword"
+        },
+      "secretValue": {
+        "value": "@gBeMnO0Qnca"
+    }
+  }
+}

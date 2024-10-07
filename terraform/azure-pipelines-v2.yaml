@@ -1,0 +1,192 @@
+name: $(BuildDefinitionName)_$(date:yyyyMMdd)$(rev:.r)
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+parameters:
+  - name: Action
+    displayName: Action
+    type: string
+    default: 'Plan'
+    values:
+    - Plan
+    - Apply
+    - Destroy
+
+variables:
+  - group: WiseOldTurtleSP  # Variable group containing SP details
+  - group: terraform        # Variable group containing Terraform-related variables
+  - name: directories
+    value: "networking,security,policy"
+  - name: action
+    value: ${{ parameters.Action }}
+
+stages:
+  - stage: RunTesting
+    jobs:
+      - job: RunTrivy
+        steps:
+          # Download and Install Trivy
+          - task: CmdLine@2
+            displayName: 'Download and Install Trivy vulnerability scanner'
+            inputs:
+              script: |
+                sudo apt-get update
+                sudo apt-get install rpm -y
+                wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.deb
+                sudo dpkg -i trivy_0.20.0_Linux-64bit.deb
+                trivy -v
+
+          # Run Trivy for LOW and MEDIUM severity issues (scans all .tf files within /terraform)
+          - task: CmdLine@2
+            displayName: 'LOW/MED - Trivy vulnerability scanner in IaC mode for Terraform files'
+            inputs:
+              script: |
+                mkdir -p trivy-reports  # Create a directory to store scan results
+                for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
+                trivy config --severity LOW,MEDIUM --exit-code 0 --format json --output trivy-reports/$(basename $file)_lowmed.json "$file"
+                done
+
+          # Run Trivy for HIGH and CRITICAL severity issues (scans all .tf files within /terraform)
+          - task: CmdLine@2
+            displayName: 'HIGH/CRIT - Trivy vulnerability scanner in IaC mode for Terraform files'
+            inputs:
+              script: |
+                for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
+                trivy config --severity HIGH,CRITICAL --exit-code 0 --format json --output trivy-reports/$(basename $file)_highcrit.json "$file"
+                done
+
+          # Publish Trivy Scan Results as a Build Artifact
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Trivy scan results as a build artifact'
+            inputs:
+              PathtoPublish: 'trivy-reports'
+              ArtifactName: 'TrivyScanResults'
+              publishLocation: 'Container'
+
+  - stage: SetupCore
+    jobs:
+      - job: CreateBackendResources
+        displayName: 'Create AZ Storage Account and Container'
+        steps:
+          # Authenticate using SP in AZ CLI
+          - script: |
+              az login --service-principal \
+                --username $(TF_VAR_client_id) \
+                --password $(TF_VAR_client_secret) \
+                --tenant $(TF_VAR_tenant_id)
+            displayName: 'Azure Login with SP for CLI'
+
+          # Create Resource Group
+          - script: |
+              az group create --name $(backendRGName) --location "UK South"
+            displayName: 'Create Resource Group'
+
+          # Create Storage Account with Private Access
+          - script: |
+              az storage account create \
+                --name $(backendStorageAccountName) \
+                --resource-group $(backendRGName) \
+                --location "UK South" \
+                --sku Standard_LRS \
+                --kind StorageV2 \
+                --access-tier Hot 
+          #     --public-network-access disabled
+            displayName: 'Create Storage Account'
+
+          # Retrieve Storage Account Key for container creation
+          - script: |
+              ACCOUNT_KEY=$(az storage account keys list --resource-group $(backendRGName) \
+              --account-name $(backendStorageAccountName) --query '[0].value' -o tsv)
+              echo "##vso[task.setvariable variable=ACCOUNT_KEY]$ACCOUNT_KEY"
+              export ARM_ACCESS_KEY=$ACCOUNT_KEY
+            displayName: 'Retrieve Storage Account Key'
+
+          # Create Storage Container using the retrieved key
+          - script: |
+              az storage container create \
+                --name $(backendContainerName) \
+                --account-name $(backendStorageAccountName) \
+                --account-key $(ACCOUNT_KEY)
+            displayName: 'Create Storage Container for Terraform Backend'
+
+  - stage: DeployCoreResources
+    condition: ne('${{ parameters.Action }}', 'Destroy')
+    jobs:
+      - job: DeployResources
+        displayName: 'Deploy Core Resources'
+        steps:
+          # Install Terraform
+          - task: TerraformInstaller@0
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: 'latest'
+
+          # Loop through directories
+          - ${{ each dir in split(variables.directories, ',') }}:
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Init (${{ dir }})'
+              inputs:
+                provider: 'azurerm'
+                command: 'init'
+                backendServiceArm: 'wiseoldturtle-terraform-sp'
+                backendAzureRmResourceGroupName: $(backendRGName)
+                backendAzureRmStorageAccountName: $(backendStorageAccountName)
+                backendAzureRmContainerName: $(backendContainerName)
+                backendAzureRmKey: '${{ dir }}.tfstate'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Plan (${{ dir }})'
+              condition: and(succeeded(), eq(variables['Action'], 'Plan'))
+              inputs:
+                provider: 'azurerm'
+                command: 'plan'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+                environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+            
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Apply (${{ dir }})'
+              condition: and(succeeded(), eq(variables['Action'], 'Apply'))
+              inputs:
+                provider: 'azurerm'
+                command: 'apply'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+                environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+
+  - stage: terraform_destroy
+    condition: eq('${{ parameters.Action }}', 'Destroy')
+    jobs:
+      - job: terraform_destroy
+        displayName: 'Destroy Resources'
+        steps:
+          - task: TerraformInstaller@0
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: 'latest'
+          
+          # Loop through directories
+          - ${{ each dir in split(variables.directories, ',') }}:
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Init (${{ dir }})'
+              inputs:
+                provider: 'azurerm'
+                command: 'init'
+                backendServiceArm: 'wiseoldturtle-terraform-sp'
+                backendAzureRmResourceGroupName: $(backendRGName)
+                backendAzureRmStorageAccountName: $(backendStorageAccountName)
+                backendAzureRmContainerName: $(backendContainerName)
+                backendAzureRmKey: '${{ dir }}.tfstate'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+
+            - task: TerraformTaskV2@2
+              displayName: 'Terraform Destroy (${{ dir }})'
+              condition: and(succeeded(), eq(variables['Action'], 'Destroy'))
+              inputs:
+                provider: 'azurerm'
+                command: 'destroy'
+                backendAzureRmKey: '${{ dir }}.tfstate'
+                workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/${{ dir }}'
+                environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'

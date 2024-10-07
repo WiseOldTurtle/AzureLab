@@ -1,0 +1,102 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "2.0.0.0",
+    "parameters": {
+        "userID" : {
+            "type" : "string"
+        }
+    },
+    "variables": {
+        "rsgElements" : "[split(resourceGroup().name,'-')]",
+        "rsgPrefix" : "[concat(variables('rsgElements')[0],variables('rsgElements')[1],variables('rsgElements')[2],variables('rsgElements')[3])]",
+        "kvName" : "[concat(variables('rsgPrefix'),'kvt01')]",
+        "backupServiceID" : "6cfd53a8-c3d6-4b02-ab5c-bde093e8e6c5",
+        "secretsObject" : [
+            {
+                "secretName": "AdminAccountName",
+                "secretValue": "********88"
+            },
+            {
+                "secretName": "AdminAccountPassword",
+                "secretValue": "********"
+            },
+            {
+                "secretName": "domainUsername",
+                "secretValue": "**********"
+            },
+            {
+                "secretName": "domainPassword",
+                "secretValue": "********"
+            }
+        ]
+    },
+    "resources": [
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "name": "[variables('kvName')]",
+            "apiVersion": "2015-06-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "enabledForDeployment": false,
+                "enabledForDiskEncryption": true,
+                "enabledForTemplateDeployment": true,
+                "tenantId": "[subscription().tenantId]",
+                "sku": {
+                    "name": "Standard",
+                    "family": "A"
+                },
+                "accessPolicies": [
+                    {
+                        "objectId": "[parameters('userId')]",
+                        "tenantId": "[subscription().tenantId]",
+                        "permissions": {
+                            "keys": [
+                                "all"
+                            ],
+                            "secrets": [
+                                "all"
+                            ],
+                            "certificates": [
+                                "all"
+                            ],
+                            "storage": [
+                                "all"
+                            ]
+                        }
+                    },
+                    {
+                        "objectId": "[variables('backupServiceID')]",
+                        "tenantId": "[subscription().tenantId]",
+                        "permissions": {
+                            "keys": [
+                                "Get",
+                                "List",
+                                "Backup"
+                            ],
+                            "secrets": [
+                                "Get",
+                                "List",
+                                "Backup"
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "name": "[concat(variables('kvName'), '/', variables('secretsObject')[copyIndex()].secretName)]",
+            "apiVersion": "2015-06-01",
+            "dependsOn": [
+                "[concat('Microsoft.KeyVault/vaults/', variables('kvName'))]"
+            ],
+            "copy": {
+                "name": "secretsCopy",
+                "count": "[length(variables('secretsObject'))]"
+                },
+            "properties": {
+                "value": "[variables('secretsObject')[copyIndex()].secretValue]"
+            }
+        }
+    ]
+}

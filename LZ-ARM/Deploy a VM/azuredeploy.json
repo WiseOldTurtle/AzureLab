@@ -1,0 +1,168 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "virtualNetworkName": {
+      "type": "string"
+    },
+    "AdminPassword": {
+      "type": "securestring",
+      "minLength": 10,
+      "maxLength": 123,
+      "metadata": {
+        "description": "Specifies the password for the local administrator account. Password must be between 12-123 characters and have no less than 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character that is not '\\' or '-'."
+      }
+    },
+    "subnetName": {
+      "type": "string"
+    },
+    "virtualMachineCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Specifies the number of virtual machine(s) to be built."
+      }
+    },
+    "virtualMachineName": {
+      "type": "string",
+      "maxLength": 16,
+      "metadata": {
+        "description": "Specifies the static portion of the name for each VM.  Maximum length is 13, to allow for a numeric suffix for Virtual Machine Names."
+      }
+    },
+    "virtualNetworkResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the Resource Group of the vNet which the VM(s) will be attached to."
+      }
+    }
+  },
+  "variables": {
+    "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-vnic')]",
+    "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+    "vnetId": "[resourceId(parameters('virtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+  
+  // This is a Variable object defining a VM used within a test environment, we later reference this using the variable(variableName).object 
+    "vmstandard" : {
+        "imageOffer" :  "WindowsServer",
+        "imageSku" : "2012-R2-Datacenter-smalldisk",
+        "publisher": "MicrosoftWindowsServer",
+        "diagnosticsStorageAccountName" : "wiseoldturtlestorage01",
+        "diagnosticsStorageAccountResourceGroup": "rg-store-wotlab01",
+        "virtualMachineDiskType" : "Standard_LRS",
+        "virtualMachineSize": "Standard_B1s",
+        "AdminUsername" : "wiseoldturtle"
+    },
+
+// these are lists of all the API's you xcan simply replace one of the variables in "apiVersion" and it will provide you with the latest API when deploying that resource.
+    "APIComputevirtualMachines": "[providers('Microsoft.Compute','virtualMachines').apiVersions[0]]",
+    "APIComputevirtualMachinesExt": "[providers('Microsoft.Compute','virtualMachines/extensions').apiVersions[0]]",
+    "APIComputeavailabilitySets": "[providers('Microsoft.Compute','availabilitySets').apiVersions[0]]",
+    "APIResourcesDeployments": "[providers('Microsoft.Resources','deployments').apiVersions[0]]",
+    "APINetworkpublicIPAddresses": "[providers('Microsoft.Network','publicIPAddresses').apiVersions[0]]",
+    "APINetworkvirtualNetworks": "[providers('Microsoft.Network','virtualNetworks').apiVersions[0]]",
+    "APINetworkvirtualNetworkSecurityGroups": "[providers('Microsoft.Network','networkSecurityGroups').apiVersions[0]]",
+    "APINetworkvirtualNetworkGateways": "[providers('Microsoft.Network','virtualNetworkGateways').apiVersions[0]]",
+    "APINetworklocalNetworkGateways": "[providers('Microsoft.Network','localNetworkGateways').apiVersions[0]]",
+    "APINetworkrouteTables": "[providers('Microsoft.Network','routeTables').apiVersions[0]]",
+    "APINetworkFirewall": "[providers('Microsoft.Network','azureFirewalls').apiVersions[0]]",
+    "APINetworkconnections": "[providers('Microsoft.Network','connections').apiVersions[0]]",
+    //"APINetworkvirtualNetworkPeerings": "[providers('Microsoft.Network','virtualNetworks/virtualNetworkPeerings').apiVersions[0]]",
+    "APINetworkloadBalancers": "[providers('Microsoft.Network','loadBalancers').apiVersions[0]]",
+    "APIStoragestorageAccounts": "[providers('Microsoft.Storage','storageAccounts').apiVersions[0]]"
+                 },
+  "resources": [
+    {
+      // When you are doing a copy loop you have to concat the name and specify the copy index. You can see on line 91 that a copy loop is defined. 
+      // a Concat is when you combine strings of text together, in this example the name of the Vnic will be a combination of the Variable and the instance of the copy loop. 
+     
+      // the copy index is broken down as such: 
+      // "copyIndex(CopyloopName)" in my example i had put a number instead of a name. If you have different copy loops that are not related to one another than you can specify the names ensure seperation.
+      // If you place a number within the () following the copyIndex then it will create a resource starting from 1 for example VM1, VM2 and so on. 
+      // there are 2 more values following the copyIndex() the first value I had set to 2 which means that the maximum number of integers can be 2
+      // the '0' value specifies the padding to use. So when it copies the VNic and VM it will make it as Vnic01 and Vnic02 
+      "name": "[concat(variables('networkInterfaceName'), padLeft(copyIndex(1), 2, '0'))]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2018-04-01",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "vmCopy",
+        "count": "[parameters('virtualMachineCount')]"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[concat(parameters('virtualMachineName'), padLeft(copyIndex(1), 2, '0'))]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2018-06-01",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "vmLoop",
+        "count": "[parameters('virtualMachineCount')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'), padLeft(copyIndex(1), 2, '0'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('vmstandard').virtualMachineSize]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('vmstandard').publisher]",
+            "offer": "[variables('vmstandard').imageOffer]",
+            "sku": "[variables('vmstandard').imageSku]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(parameters('virtualMachineName'), padLeft(copyIndex(1), 2, '0'),'-osDisk')]",
+            "createOption": "FromImage",
+            "managedDisk": {
+              "storageAccountType": "[variables('vmstandard').virtualMachineDiskType]"
+            }
+          },
+          "dataDisks": [
+
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceName'), padLeft(copyIndex(1), 2, '0')))]"
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('virtualMachineName'), padLeft(copyIndex(1), 2, '0'))]",
+          "adminUsername": "[variables('vmstandard').AdminUsername]",
+          "adminPassword": "[parameters('AdminPassword')]",
+          "windowsConfiguration": {
+            "provisionVmAgent": true
+          },
+          "secrets": []
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[reference(resourceId(variables('vmstandard').diagnosticsStorageAccountResourceGroup, 'Microsoft.Storage/storageAccounts', variables('vmstandard').diagnosticsStorageAccountName), '2016-01-01').primaryEndpoints.blob]"
+          }
+        }
+      }
+    }
+  ]
+}

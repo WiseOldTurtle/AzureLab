@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+ 
+ "variables": {
+  
+  "KeyVaultName": "kv-uks-wotlab01",
+  "secretName" : "AdminAccountPassword",
+  "secretValue": "@gBeMnO0Qnca" ,
+  "location" : " Uk South"
+
+  },
+
+ "resources": [
+    {
+        "type": "Microsoft.KeyVault/vaults",
+        "name": "[variables('KeyVaultName')]",
+        "apiVersion": "2015-06-01",
+        "location": "UK South",
+        "properties": {
+          "enabledForDeployment": false,
+          "enabledForDiskEncryption": true,
+          "enabledForTemplateDeployment": true,
+          "sku": {
+            "family": "A",
+            "name": "Standard"
+          },
+          "tenantId": "33c90149-5e62-4acc-81f8-ebcd6591227f",
+          "accessPolicies": [
+            {
+              "tenantId": "33c90149-5e62-4acc-81f8-ebcd6591227f",
+              "objectId": "3ca1aa0c-950a-4e8b-b00f-ab3ab0a13d8c",
+              "permissions": {
+                "keys": [ "All" ],
+                "secrets": [ "All" ]
+              }
+            }
+          ]
+        }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2019-09-01",
+      "name": "[concat(variables('keyVaultName'), '/', variables('secretName'))]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+      ],
+      "properties": {
+        "value": "[variables('secretValue')]"
+      }
+    }
+]
+}

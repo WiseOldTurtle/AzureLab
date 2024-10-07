@@ -1,0 +1,231 @@
+name: $(BuildDefinitionName)_$(date:yyyyMMdd)$(rev:.r)
+
+trigger: none
+  # branches:
+  #   include:
+  #     - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: WiseOldTurtleSP  # Variable group containing SP details
+  - group: terraform        # Variable group containing Terraform-related variables
+  - name: TF_VARS_subscription_id
+    value: $(TF_VARS_subscription_id)  # Reference the variable from the Azure DevOps variable group
+
+stages:
+  - stage: RunTesting
+    jobs:
+      - job: RunTrivy
+        steps:
+          # Download and Install Trivy
+        - task: CmdLine@2
+          displayName: 'Download and Install Trivy vulnerability scanner'
+          inputs:
+            script: |
+              sudo apt-get update
+              sudo apt-get install rpm -y
+              wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.deb
+              sudo dpkg -i trivy_0.20.0_Linux-64bit.deb
+              trivy -v
+
+          # Run Trivy for LOW and MEDIUM severity issues (scans all .tf files within /terraform)
+        - task: CmdLine@2
+          displayName: 'LOW/MED - Trivy vulnerability scanner in IaC mode for Terraform files'
+          inputs:
+            script: |
+              mkdir -p trivy-reports  # Create a directory to store scan results
+              for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
+              trivy config --severity LOW,MEDIUM --exit-code 0 --format json --output trivy-reports/$(basename $file)_lowmed.json "$file"
+              done
+
+          # Run Trivy for HIGH and CRITICAL severity issues (scans all .tf files within /terraform)
+        - task: CmdLine@2
+          displayName: 'HIGH/CRIT - Trivy vulnerability scanner in IaC mode for Terraform files'
+          inputs:
+            script: |
+              for file in $(find $(System.DefaultWorkingDirectory)/terraform -name "*.tf"); do
+              trivy config --severity HIGH,CRITICAL --exit-code 0 --format json --output trivy-reports/$(basename $file)_highcrit.json "$file"
+              done
+
+          # Publish Trivy Scan Results as a Build Artifact
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Trivy scan results as a build artifact'
+          inputs:
+            PathtoPublish: 'trivy-reports'
+            ArtifactName: 'TrivyScanResults'
+            publishLocation: 'Container'
+
+  - stage: SetupBackend
+    jobs:
+      - job: CreateBackendResources
+        displayName: 'Create Backend Resources'
+        steps:
+          # Azure CLI Login using Service Principal
+          - script: |
+              az login --service-principal \
+                --username $(TF_VAR_client_id) \
+                --password $(TF_VAR_client_secret) \
+                --tenant $(TF_VAR_tenant_id)
+            displayName: 'Azure Login with SP'
+
+          # Resource Group Creation
+          - script: |
+              az group create --name $(backendRGName) --location "UK South"
+            displayName: 'Create Resource Group'
+
+          # Create Storage Account with Private Access
+          - script: |
+              az storage account create \
+                --name $(backendStorageAccountName) \
+                --resource-group $(backendRGName) \
+                --location "UK South" \
+                --sku Standard_LRS \
+                --kind StorageV2 \
+                --access-tier Hot 
+          #     --public-network-access disabled
+            displayName: 'Create Storage Account'
+
+          # # Set Network Rules for Storage Account  
+          # - script: |
+          #     az storage account network-rule add \
+          #       --resource-group $(backendRGName) \
+          #       --account-name $(backendStorageAccountName) \
+          #       --bypass AzureServices \
+          #       --vnet \
+          #       --subnet 
+          #   displayName: 'Configure Network Rules for Storage Account'
+
+          # Retrieve Storage Account Key for container creation
+          - script: |
+              STORAGE_ACCOUNT_KEY=$(az storage account keys list \
+                --resource-group $(backendRGName) \
+                --account-name $(backendStorageAccountName) \
+                --query '[0].value' \
+                --output tsv)
+              echo "##vso[task.setvariable variable=STORAGE_ACCOUNT_KEY]$STORAGE_ACCOUNT_KEY"
+            displayName: 'Retrieve Storage Account Key'
+
+          # Create Storage Container using the retrieved key
+          - script: |
+              az storage container create \
+                --name $(backendContainerName) \
+                --account-name $(backendStorageAccountName) \
+                --account-key $(STORAGE_ACCOUNT_KEY)
+            displayName: 'Create Storage Container for Terraform Backend'
+
+
+  - stage: DeployCoreResources
+    jobs:
+      - job: DeployNetworking
+        displayName: 'Deploy Networking Resources'
+        steps:
+          # Initialize Terraform and deploy resources for Networking
+          - task: TerraformInstaller@0
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: 'latest'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Init (Networking)'
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'wiseoldturtle-terraform-sp'
+              backendAzureRmResourceGroupName: $(backendRGName)
+              backendAzureRmStorageAccountName: $(backendStorageAccountName)
+              backendAzureRmContainerName: $(backendContainerName)
+              backendAzureRmKey: 'networking.tfstate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Plan (Networking)'
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+         #    commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Apply (Networking)'
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              commandOptions: '-auto-approve'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/networking'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+
+      - job: DeploySecurity
+        displayName: 'Deploy Security Resources'
+        steps:
+          # Initialize Terraform and deploy resources for Security
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Init (Security)'
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'wiseoldturtle-terraform-sp'
+              backendAzureRmResourceGroupName: $(backendRGName)
+              backendAzureRmStorageAccountName: $(backendStorageAccountName)
+              backendAzureRmContainerName: $(backendContainerName)
+              backendAzureRmKey: 'security.tfstate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Plan (Security)'
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+          #   commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Apply (Security)'
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              commandOptions: '-auto-approve'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/security'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+
+      - job: DeployPolicy
+        displayName: 'Deploy Policy Resources'
+        steps:
+          # Initialize Terraform and deploy resources for Policy
+          - task: TerraformInstaller@0
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: 'latest'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Init (Policy)'
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'wiseoldturtle-terraform-sp'
+              backendAzureRmResourceGroupName: $(backendRGName)
+              backendAzureRmStorageAccountName: $(backendStorageAccountName)
+              backendAzureRmContainerName: $(backendContainerName)
+              backendAzureRmKey: 'policy.tfstate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Plan (Policy)'
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+          #   commandOptions: '-var subscription_id=$(TF_VARS_subscription_id)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'
+
+          - task: TerraformTaskV2@2
+            displayName: 'Terraform Apply (Policy)'
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              commandOptions: '-auto-approve'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/policy'
+              environmentServiceNameAzureRM: 'wiseoldturtle-terraform-sp'

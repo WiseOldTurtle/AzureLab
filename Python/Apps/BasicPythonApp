@@ -1,0 +1,143 @@
+## Alphabetically sorts lists
+import re
+
+## This is an array that will get populated after you fill out option 1 and 2 
+order_list = []
+
+## This is a variable that will be populated once you fill in option 1 
+customer_dict = {}
+
+## This is the prduct dictionary (list of products available Name and Price) each in their own categories
+product_dict = {
+   "1": {"category": "Peripherals", "items": {"1": ("Epson C831", 100), "2": ("Epson Workforce Pro WF-3820", 150), "3": ("KROCEUS 64GB Memory Stick 3 pack", 25)}},
+
+       "2": {"category": "Software", "items": {"1": ("Windows 11", 120), "2": ("Microsoft Office", 200), "3": ("Norton Antivirus", 40), "4": ("McAfee Antivirus", 35), "5": ("Adobe Photoshop", 300)}}
+
+   }
+## Initial Menu Screen Selection
+menu_choice = 0
+
+## Definition for the initial Menu Screen
+def display_menu():
+    print("Simply Computing Order System")
+    print("****** *****")
+    print("**** Main Menu ****")
+    print("--------------")
+    print("1: Add customer details (Name, ID, Address, Mobile number)")
+    print("2: Raise an Order (Select products from categories)")
+    print("3: Check Orders")
+    print("4: Help Screen")
+    print("5: Exit")
+
+##Definition for the Help Menu
+def display_help():
+    print("\nHelp Screen")
+    print("1: Add customer details - This option alows you to add customer details")
+    print("2: Raise an Order - This option allows you to raise an order against a customer")
+    print("3: Check Orders - This option allows you to check existing orders that have been raised")
+    print("4: Help Screen - Access to help menu")
+    print("5: Exit - Close Applicaiton")
+
+## Validation against the Name 
+def validate_name(name):
+    if not name.isalpha():
+        print("Please enter the correct format of Forename.")
+        return False
+    return True
+
+## Help stuff added here 
+while menu_choice != 5:
+    display_menu()  # Show main menu options
+    try:
+        menu_choice = int(input("Enter your choice: "))
+    except ValueError:
+        print("Invalid input. Please enter a number.")
+        continue  # Restart loop if input is invalid
+
+    if menu_choice == 1:
+        # Add customer details
+        customer_name = input("Enter customer name: ")
+        while not validate_name(customer_name):
+            customer_name = input("Enter customer name: ")
+        customer_id = input("Enter customer ID: ")
+        customer_address = input("Enter customer address: ")
+        while not validate_address(customer_address):
+            customer_address = input("Enter customer address: ")
+        customer_mobile = input("Enter customer mobile number: ")
+        customer_dict[customer_id] = {
+            "name": customer_name,
+            "address": customer_address,
+            "mobile": customer_mobile,
+            "orders": []
+        }
+        print("Customer details added successfully!")
+
+## This is where option 2's code is. It is looking for a customer ID which we created in the First Option
+    elif menu_choice == 2:
+        # Add an order
+        customer_id = input("Enter customer ID: ")
+        if customer_id in customer_dict:
+            order_items = []
+            print("\nAvailable Categories:")
+            for category_id, category_data in product_dict.items():
+                print(f"{category_id}: {category_data['category']}")
+            while True:
+                category_choice = input("Enter category ID to add products (or 'done' to finish): ")
+                if category_choice.lower() == 'done':
+                    break
+                if category_choice in product_dict:
+                    print("\nProducts in", product_dict[category_choice]['category'])
+                    for product_id, product_data in product_dict[category_choice]['items'].items():
+                        print(f"{product_id}: {product_data[0]} - ${product_data[1]}")
+                    while True:
+                        product_choice = input("Enter product ID to add (or 'back' to go back to categories): ")
+                        if product_choice.lower() == 'back':
+                            break
+                        if product_choice in product_dict[category_choice]['items']:
+                            order_items.append((product_dict[category_choice]['items'][product_choice][0], product_dict[category_choice]['items'][product_choice][1]))
+                            print(f"Added {product_dict[category_choice]['items'][product_choice][0]} to the order.")
+                            break
+                        else:
+                            print("Invalid product ID. Please try again.")
+                else:
+                    print("Invalid category ID. Please try again.")
+            if order_items:
+                order_list.append({"customer_id": customer_id, "items": order_items})
+                customer_dict[customer_id]['orders'].append({"items": order_items})
+                print("Order added successfully!")
+            else:
+                print("No items were added to the order.")
+        else:
+            print("Customer ID not found.")
+    elif menu_choice == 3:
+        # Search and display customer orders
+        search_term = input("Enter customer name or ID to search: ")
+        found_customers = []
+        for customer_id, customer_data in customer_dict.items():
+            if search_term.lower() in customer_data['name'].lower() or search_term == customer_id:
+                found_customers.append(customer_id)
+        if found_customers:
+            for customer_id in found_customers:
+                print(f"\nCustomer ID: {customer_id}")
+                print(f"Name: {customer_dict[customer_id]['name']}")
+                print(f"Address: {customer_dict[customer_id]['address']}")
+                print(f"Mobile: {customer_dict[customer_id]['mobile']}")
+                if customer_dict[customer_id]['orders']:
+                    for order_index, order in enumerate(customer_dict[customer_id]['orders']):
+                        print(f"\nOrder {order_index + 1}:")
+                        for item_name, item_price in order['items']:
+                            print(f"- {item_name} - ${item_price}")
+                else:
+                    print("No orders found for this customer.")
+        else:
+            print("No customers found matching the search criteria.")
+    # Display help screen
+    elif menu_choice == 4:
+        display_help()
+    # Exit's application
+    elif menu_choice == 5:
+        print("Exiting...")
+        break
+
+    else:
+        print("Invalid choice. Please try again.")

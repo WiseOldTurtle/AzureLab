@@ -14,7 +14,7 @@
  - *updated template is* **AzureLab\terraform\azure-pipelines-v2.yaml** Made the following changes:
   - Added in testing in the form of trivy (exports reports as artifact to pipeline run)
   - realised that the pipeline tasks were repeatable, see original **AzureLab\terraform\azure-pipelines.yaml** so I added in a for each loop to loop through the directories.
-  - Due to the 3 different directories, 3 different state files are created alongside so they need to be referenced.
+  - Due to the 3 different directories, 3 different state files are created alongside so they need to be referenced in the pipeline.
 
 ## **Architecture:** 
 
